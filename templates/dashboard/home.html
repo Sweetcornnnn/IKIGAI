@@ -1,0 +1,796 @@
+{% extends 'dashboard/base.html' %}
+{% load dashboard_filters %}
+
+{% block content %}
+<style>
+    /* Hide scrollbar */
+    ::-webkit-scrollbar {
+        display: none;
+    }
+    * {
+        scrollbar-width: none;
+    }
+    body {
+        -ms-overflow-style: none;
+    }
+
+    .welcome-section {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 32px;
+    }
+
+    .welcome-section h1 {
+        font-size: 28px;
+        font-weight: 700;
+    }
+
+    .welcome-section h1 span {
+        color: var(--gold);
+    }
+
+    .welcome-section p {
+        color: var(--text-muted);
+        font-size: 16px;
+        margin-top: 4px;
+    }
+
+    .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 16px;
+        margin-bottom: 32px;
+    }
+
+    .stat-card {
+        background-color: var(--panel-dark);
+        border-radius: 12px;
+        padding: 20px 24px;
+        border: 1px solid var(--border-subtle);
+    }
+
+    .stat-card .number {
+        font-size: 32px;
+        font-weight: 700;
+        color: var(--gold);
+    }
+
+    .stat-card .label {
+        font-size: 12px;
+        color: var(--text-muted);
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        margin-top: 4px;
+    }
+
+    .task-stats {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+        gap: 12px;
+        margin-bottom: 32px;
+    }
+
+    .task-stats .stat-card {
+        background-color: var(--panel-dark);
+        border-radius: 12px;
+        padding: 16px 20px;
+        border: 1px solid var(--border-subtle);
+        text-align: center;
+    }
+
+    .task-stats .stat-card .number {
+        font-size: 28px;
+        font-weight: 700;
+    }
+
+    .task-stats .stat-card .label {
+        font-size: 11px;
+        color: var(--text-muted);
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        margin-top: 4px;
+    }
+
+    /* Chart & Calendar Row */
+    .chart-calendar-row {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 24px;
+        margin-bottom: 32px;
+    }
+
+    .chart-container {
+        background-color: var(--panel-dark);
+        border-radius: 12px;
+        padding: 24px;
+        border: 1px solid var(--border-subtle);
+    }
+
+    .chart-container h3 {
+        font-size: 16px;
+        font-weight: 700;
+        margin-bottom: 16px;
+    }
+
+    .chart-wrapper {
+        position: relative;
+        height: 200px;
+        width: 100%;
+    }
+
+    #progressChart {
+        width: 100% !important;
+        height: 100% !important;
+        max-height: 200px;
+    }
+
+    .chart-labels {
+        margin-top: 8px;
+        font-size: 11px;
+        color: var(--text-muted);
+        text-align: center;
+        opacity: 0.6;
+    }
+
+    .calendar-container {
+        background-color: var(--panel-dark);
+        border-radius: 12px;
+        padding: 24px;
+        border: 1px solid var(--border-subtle);
+    }
+
+    .calendar-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 16px;
+    }
+
+    .calendar-header h3 {
+        font-size: 16px;
+        font-weight: 700;
+    }
+
+    .calendar-header span {
+        color: var(--text-muted);
+        font-size: 12px;
+    }
+
+    .calendar-grid {
+        display: grid;
+        grid-template-columns: repeat(7, 1fr);
+        gap: 4px;
+        text-align: center;
+    }
+
+    .calendar-day-label {
+        font-size: 10px;
+        color: var(--text-muted);
+        font-weight: 600;
+        padding: 4px;
+    }
+
+    .calendar-empty {
+        padding: 4px;
+    }
+
+    .calendar-day {
+        padding: 4px;
+        font-size: 12px;
+        border-radius: 4px;
+        position: relative;
+    }
+
+    .calendar-day.has-due {
+        background-color: rgba(201, 169, 110, 0.15);
+        border: 1px solid rgba(201, 169, 110, 0.3);
+    }
+
+    .calendar-day.has-completed {
+        background-color: rgba(111, 175, 138, 0.15);
+        border: 1px solid var(--success-green);
+    }
+
+    .calendar-dots {
+        display: flex;
+        justify-content: center;
+        gap: 2px;
+        margin-top: 2px;
+    }
+
+    .dot-completed {
+        font-size: 6px;
+        color: var(--success-green);
+    }
+
+    .dot-due {
+        font-size: 6px;
+        color: var(--gold);
+    }
+
+    .calendar-legend {
+        margin-top: 12px;
+        display: flex;
+        gap: 16px;
+        justify-content: center;
+        font-size: 11px;
+        color: var(--text-muted);
+        flex-wrap: wrap;
+    }
+
+    .legend-due {
+        color: var(--gold);
+    }
+
+    .legend-completed {
+        color: var(--success-green);
+    }
+
+    /* Category Stats */
+    .category-container {
+        background-color: var(--panel-dark);
+        border-radius: 12px;
+        padding: 24px;
+        border: 1px solid var(--border-subtle);
+        margin-bottom: 32px;
+    }
+
+    .category-container h3 {
+        font-size: 16px;
+        font-weight: 700;
+        margin-bottom: 16px;
+    }
+
+    .category-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+        gap: 12px;
+    }
+
+    .category-item {
+        background-color: rgba(255,255,255,0.02);
+        border-radius: 8px;
+        padding: 12px 16px;
+        border: 1px solid var(--border-subtle);
+    }
+
+    .category-name {
+        font-size: 13px;
+        font-weight: 600;
+        color: var(--text-white);
+    }
+
+    .category-progress {
+        display: flex;
+        justify-content: space-between;
+        font-size: 12px;
+        color: var(--text-muted);
+        margin-top: 4px;
+    }
+
+    .category-bar {
+        background-color: rgba(255,255,255,0.04);
+        border-radius: 4px;
+        height: 4px;
+        margin-top: 4px;
+        overflow: hidden;
+    }
+
+    .category-bar-fill {
+        background-color: var(--gold);
+        height: 100%;
+        border-radius: 4px;
+    }
+
+    /* Recent Activity & Tasks */
+    .recent-row {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 24px;
+        margin-bottom: 32px;
+    }
+
+    .recent-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 16px;
+    }
+
+    .recent-header h3 {
+        font-size: 16px;
+        font-weight: 700;
+    }
+
+    .view-all {
+        color: var(--gold);
+        text-decoration: none;
+        font-size: 14px;
+    }
+
+    .recent-list {
+        background-color: var(--panel-dark);
+        border-radius: 12px;
+        border: 1px solid var(--border-subtle);
+        padding: 16px;
+        max-height: 300px;
+        overflow-y: auto;
+    }
+
+    .recent-item {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 8px 0;
+        border-bottom: 1px solid var(--border-subtle);
+    }
+
+    .recent-item:last-child {
+        border-bottom: none;
+    }
+
+    .recent-icon {
+        font-size: 18px;
+    }
+
+    .recent-content {
+        flex: 1;
+    }
+
+    .recent-title {
+        font-size: 13px;
+        color: var(--text-white);
+    }
+
+    .recent-time {
+        font-size: 11px;
+        color: var(--text-muted);
+    }
+
+    .recent-link {
+        color: var(--text-muted);
+        text-decoration: none;
+        font-size: 12px;
+    }
+
+    .recent-empty {
+        text-align: center;
+        padding: 20px;
+        color: var(--text-muted);
+    }
+
+    .task-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 8px 0;
+        border-bottom: 1px solid var(--border-subtle);
+    }
+
+    .task-item:last-child {
+        border-bottom: none;
+    }
+
+    .task-info {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .task-title {
+        font-size: 13px;
+        color: var(--text-white);
+    }
+
+    .task-title.task-completed {
+        text-decoration: line-through;
+        color: var(--text-muted);
+    }
+
+    .task-meta {
+        font-size: 10px;
+        color: var(--text-muted);
+    }
+
+    .task-xp {
+        font-size: 11px;
+        color: var(--gold);
+    }
+
+    @media (max-width: 768px) {
+        .stats-grid {
+            grid-template-columns: repeat(2, 1fr);
+        }
+
+        .task-stats {
+            grid-template-columns: repeat(3, 1fr);
+        }
+
+        .welcome-section {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 16px;
+        }
+
+        .chart-calendar-row,
+        .recent-row {
+            grid-template-columns: 1fr !important;
+        }
+    }
+</style>
+
+<div class="welcome-section">
+    <div>
+        <h1>Welcome back, <span>{{ user.username }}</span></h1>
+        <p>Your productivity journey continues. Let's make today count.</p>
+    </div>
+    <div style="display: flex; gap: 12px; align-items: center;">
+        <a href="{% url 'tasks:weekly' %}" class="btn-create" style="padding: 10px 20px; background-color: var(--gold); color: var(--dark-bg); border-radius: 8px; text-decoration: none; font-weight: 600; font-size: 14px; transition: opacity 0.2s; display: inline-block;">
+            Let's Start?
+        </a>
+    </div>
+</div>
+
+<div class="stats-grid">
+    <div class="stat-card">
+        <div class="number">{{ profile.xp }}</div>
+        <div class="label">Total XP</div>
+    </div>
+    <div class="stat-card">
+        <div class="number">{{ profile.level }}</div>
+        <div class="label">Level</div>
+    </div>
+    <div class="stat-card" style="border-color: {% if streak_status.status == 'active' %}var(--success-green){% elif streak_status.status == 'at_risk' %}var(--gold){% else %}var(--border-subtle){% endif %};">
+        <div class="number" style="color: {% if streak_status.status == 'active' %}var(--success-green){% elif streak_status.status == 'at_risk' %}var(--gold){% else %}var(--text-muted){% endif %};">
+            {{ profile.streak_days }}
+        </div>
+        <div class="label">Day Streak</div>
+        <div style="font-size: 12px; color: var(--text-muted); margin-top: 6px;">
+            {{ streak_status.message }}
+        </div>
+    </div>
+    <div class="stat-card">
+        <div class="number">{{ completed_tasks }}</div>
+        <div class="label">Tasks Completed</div>
+    </div>
+</div>
+
+<!-- Task Stats -->
+<div class="task-stats">
+    <div class="stat-card">
+        <div class="number" style="font-size: 20px; color: var(--text-white);">{{ total_tasks }}</div>
+        <div class="label">Total Tasks</div>
+    </div>
+    <div class="stat-card">
+        <div class="number" style="font-size: 20px; color: var(--success-green);">{{ completed_tasks }}</div>
+        <div class="label">Completed</div>
+    </div>
+    <div class="stat-card">
+        <div class="number" style="font-size: 20px; color: var(--gold);">{{ pending_tasks }}</div>
+        <div class="label">Pending</div>
+    </div>
+    <div class="stat-card">
+        <div class="number" style="font-size: 20px; color: var(--danger-red);">{{ overdue_tasks }}</div>
+        <div class="label">Overdue</div>
+    </div>
+    <div class="stat-card">
+        <div class="number" style="font-size: 20px; color: var(--text-muted);">
+            {% if total_tasks > 0 %}
+                {{ completed_tasks|floatformat:0 }}%
+            {% else %}
+                0%
+            {% endif %}
+        </div>
+        <div class="label">Completion Rate</div>
+    </div>
+</div>
+
+<!-- Habits Section -->
+<div style="background: var(--panel-dark); border-radius: 12px; padding: 24px; border: 1px solid var(--border-subtle); margin-bottom: 32px;">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+        <h3 style="font-size: 16px; font-weight: 700;">🌱 Habits</h3>
+        <a href="{% url 'habits:list' %}" style="color: var(--gold); text-decoration: none; font-size: 14px;">View All →</a>
+    </div>
+
+    <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px;">
+        <div style="text-align: center; padding: 12px; background: rgba(255,255,255,0.02); border-radius: 8px; border: 1px solid var(--border-subtle);">
+            <div style="font-size: 24px; font-weight: 700; color: var(--gold);">{{ total_habits }}</div>
+            <div style="font-size: 11px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px;">Total Habits</div>
+        </div>
+        <div style="text-align: center; padding: 12px; background: rgba(255,255,255,0.02); border-radius: 8px; border: 1px solid var(--border-subtle);">
+            <div style="font-size: 24px; font-weight: 700; color: var(--success-green);">{{ today_percentage }}%</div>
+            <div style="font-size: 11px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px;">Today's Progress</div>
+        </div>
+        <div style="text-align: center; padding: 12px; background: rgba(255,255,255,0.02); border-radius: 8px; border: 1px solid var(--border-subtle);">
+            <div style="font-size: 24px; font-weight: 700; color: var(--gold);">{{ month_percentage }}%</div>
+            <div style="font-size: 11px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px;">Monthly Progress</div>
+        </div>
+    </div>
+
+    {% if recent_habit_logs %}
+    <div style="margin-top: 12px; padding: 12px 16px; background: rgba(255,255,255,0.02); border-radius: 8px; border: 1px solid var(--border-subtle);">
+        <div style="font-size: 12px; color: var(--text-muted); margin-bottom: 8px;">Recent completions:</div>
+        <div style="display: flex; gap: 12px; flex-wrap: wrap;">
+            {% for log in recent_habit_logs %}
+            <span style="font-size: 12px; color: var(--text-secondary);">
+                {{ log.habit.icon }} {{ log.habit.name }} <span style="color: var(--text-muted);">({{ log.date|date:"M d" }})</span>
+            </span>
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
+</div>
+
+<!-- Goals Section -->
+<div style="background: var(--panel-dark); border-radius: 12px; padding: 24px; border: 1px solid var(--border-subtle); margin-bottom: 32px;">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+        <h3 style="font-size: 16px; font-weight: 700;">🎯 Goals</h3>
+        <a href="{% url 'goals:dashboard' %}" style="color: var(--gold); text-decoration: none; font-size: 14px;">View All →</a>
+    </div>
+    <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px;">
+        <div style="text-align: center; padding: 12px; background: rgba(255,255,255,0.02); border-radius: 8px; border: 1px solid var(--border-subtle);">
+            <div style="font-size: 24px; font-weight: 700; color: var(--gold);">{{ total_goals }}</div>
+            <div style="font-size: 11px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px;">Total Goals</div>
+        </div>
+        <div style="text-align: center; padding: 12px; background: rgba(255,255,255,0.02); border-radius: 8px; border: 1px solid var(--border-subtle);">
+            <div style="font-size: 24px; font-weight: 700; color: var(--success-green);">{{ completed_goals }}</div>
+            <div style="font-size: 11px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px;">Completed</div>
+        </div>
+        <div style="text-align: center; padding: 12px; background: rgba(255,255,255,0.02); border-radius: 8px; border: 1px solid var(--border-subtle);">
+            <div style="font-size: 24px; font-weight: 700; color: var(--gold);">{{ goal_completion_rate }}%</div>
+            <div style="font-size: 11px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px;">Completion Rate</div>
+        </div>
+    </div>
+</div>
+
+<!-- Chart & Calendar Row -->
+<div class="chart-calendar-row">
+    <!-- Chart -->
+    <div class="chart-container">
+        <h3>📊 Weekly Progress</h3>
+        <div class="chart-wrapper">
+            <canvas id="progressChart"></canvas>
+        </div>
+        <div class="chart-labels">
+            {{ chart_labels|join:" · " }}
+        </div>
+    </div>
+
+    <!-- Calendar -->
+    <div class="calendar-container">
+        <div class="calendar-header">
+            <h3>📅 {{ today|date:"F Y" }}</h3>
+            <span>{{ calendar_tasks_count }} events</span>
+        </div>
+        <div class="calendar-grid">
+            {% for day in "SMTWTFS" %}
+            <div class="calendar-day-label">{{ day }}</div>
+            {% endfor %}
+
+            {% with first_day=today|date:"Y-m-01"|date:"w" %}
+                {% for i in "123456"|make_list %}
+                    {% if forloop.counter0|add:1 <= first_day|add:"0" %}
+                    <div class="calendar-empty"></div>
+                    {% endif %}
+                {% endfor %}
+
+                {% with days_in_month=today|date:"t"|add:"0" %}
+                {% for day in days_in_month|make_list %}
+                {% with date_str=today|date:"Y-m-"|add:day %}
+                {% with day_events=calendar_data|get_item:date_str %}
+                <div class="calendar-day {% if day_events %}{% for event in day_events %}{% if event.type == 'completed' %}has-completed{% elif event.type == 'due' %}has-due{% endif %}{% endfor %}{% endif %}">
+                    {{ day }}
+                    {% if day_events %}
+                        <div class="calendar-dots">
+                            {% for event in day_events %}
+                                {% if event.type == 'completed' %}
+                                    <span class="dot-completed">●</span>
+                                {% elif event.type == 'due' %}
+                                    <span class="dot-due">●</span>
+                                {% endif %}
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                </div>
+                {% endwith %}
+                {% endwith %}
+                {% endfor %}
+                {% endwith %}
+            {% endwith %}
+        </div>
+        <div class="calendar-legend">
+            <span>● <span class="legend-due">Task due</span></span>
+            <span>● <span class="legend-completed">Task completed</span></span>
+            <span>○ No activity</span>
+        </div>
+    </div>
+</div>
+
+<!-- Category Stats -->
+{% if category_stats %}
+<div class="category-container">
+    <h3>📂 Category Breakdown</h3>
+    <div class="category-grid">
+        {% for category, stats in category_stats.items %}
+        <div class="category-item">
+            <div class="category-name">{{ category }}</div>
+            <div class="category-progress">
+                <span>{{ stats.completed }}/{{ stats.total }}</span>
+                <span>{{ stats.percentage }}%</span>
+            </div>
+            <div class="category-bar">
+                <div class="category-bar-fill" style="width: {{ stats.percentage }}%;"></div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endif %}
+
+<!-- Recent Activity & Recent Tasks -->
+<div class="recent-row">
+    <!-- Recent Activity -->
+    <div>
+        <div class="recent-header">
+            <h3>⚡ Recent Activity</h3>
+        </div>
+        <div class="recent-list">
+            {% if recent_activity %}
+                {% for activity in recent_activity %}
+                <div class="recent-item">
+                    <span class="recent-icon">{{ activity.icon }}</span>
+                    <div class="recent-content">
+                        <div class="recent-title">{{ activity.title }}</div>
+                        <div class="recent-time">{{ activity.time|timesince }} ago</div>
+                    </div>
+                    <a href="{{ activity.link }}" class="recent-link">→</a>
+                </div>
+                {% endfor %}
+            {% else %}
+                <div class="recent-empty">
+                    <p>No activity yet. Complete a task to get started!</p>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Recent Tasks -->
+    <div>
+        <div class="recent-header">
+            <h3>📋 Recent Tasks</h3>
+            <a href="{% url 'tasks:weekly' %}" class="view-all">View All →</a>
+        </div>
+        <div class="recent-list">
+            {% if recent_tasks %}
+                {% for task in recent_tasks %}
+                <div class="task-item">
+                    <div class="task-info">
+                        <span>{% if task.status == 'COMPLETED' %}✅{% else %}◯{% endif %}</span>
+                        <div>
+                            <div class="task-title {% if task.status == 'COMPLETED' %}task-completed{% endif %}">
+                                {{ task.title }}
+                            </div>
+                            <div class="task-meta">
+                                {{ task.get_category_display }} · {{ task.created_at|timesince }} ago
+                            </div>
+                        </div>
+                    </div>
+                    <span class="task-xp">+{{ task.xp_reward }} XP</span>
+                </div>
+                {% endfor %}
+            {% else %}
+                <div class="recent-empty">
+                    <p>No tasks yet. <a href="{% url 'tasks:weekly' %}" style="color: var(--gold); text-decoration: none;">Create your first task</a></p>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<!-- Chart Script -->
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        console.log('📊 Chart script running...');
+
+        const canvas = document.getElementById('progressChart');
+        if (!canvas) {
+            console.error('❌ Canvas element not found!');
+            return;
+        }
+        console.log('✅ Canvas found');
+
+        const ctx = canvas.getContext('2d');
+        console.log('✅ Context created');
+
+        const labels = {{ chart_labels|safe }};
+        const data = {{ chart_data|safe }};
+        console.log('📊 Labels:', labels);
+        console.log('📊 Data:', data);
+
+        const hasData = data.some(value => value > 0);
+        if (!hasData) {
+            console.log('ℹ️ No data to display - showing empty state');
+            const container = canvas.parentElement;
+            container.innerHTML = `
+                <div style="display: flex; align-items: center; justify-content: center; height: 100%; color: var(--text-muted); font-size: 14px; flex-direction: column; gap: 8px;">
+                    <span style="font-size: 32px;">📈</span>
+                    <span>Complete tasks to see your weekly progress</span>
+                </div>
+            `;
+            return;
+        }
+
+        if (window.progressChart && typeof window.progressChart.destroy === 'function') {
+            console.log('🔄 Destroying existing chart');
+            window.progressChart.destroy();
+        }
+
+        try {
+            window.progressChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Tasks Completed',
+                        data: data,
+                        backgroundColor: 'rgba(201, 169, 110, 0.6)',
+                        borderColor: '#C9A96E',
+                        borderWidth: 2,
+                        borderRadius: 4,
+                        maxBarThickness: 40,
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    animation: {
+                        duration: 500
+                    },
+                    plugins: {
+                        legend: {
+                            display: false,
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                stepSize: 1,
+                                color: 'rgba(255,255,255,0.3)',
+                                font: {
+                                    size: 10
+                                }
+                            },
+                            grid: {
+                                color: 'rgba(255,255,255,0.05)',
+                            }
+                        },
+                        x: {
+                            ticks: {
+                                color: 'rgba(255,255,255,0.3)',
+                                font: {
+                                    size: 10
+                                }
+                            },
+                            grid: {
+                                display: false,
+                            }
+                        }
+                    }
+                }
+            });
+            console.log('✅ Chart created successfully!');
+        } catch (error) {
+            console.error('❌ Error creating chart:', error);
+            const container = canvas.parentElement;
+            container.innerHTML = `
+                <div style="display: flex; align-items: center; justify-content: center; height: 100%; color: var(--danger-red); font-size: 14px; flex-direction: column; gap: 8px;">
+                    <span>⚠️</span>
+                    <span>Chart failed to load. Please refresh.</span>
+                </div>
+            `;
+        }
+    });
+</script>
+{% endblock %}

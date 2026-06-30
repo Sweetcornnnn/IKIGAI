@@ -1,0 +1,1044 @@
+{% extends 'dashboard/base.html' %}
+{% load static %}
+
+{% block title %}Goals - IKIGAI{% endblock %}
+
+{% block content %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<style>
+    /* Hide scrollbar */
+    ::-webkit-scrollbar { display: none; }
+    * { scrollbar-width: none; }
+    body { -ms-overflow-style: none; }
+
+    .goals-container {
+        max-width: 100%;
+        padding: 0 16px;
+    }
+
+    .goals-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 12px 0;
+        border-bottom: 2px solid var(--border-subtle);
+        margin-bottom: 20px;
+        flex-wrap: wrap;
+        gap: 12px;
+    }
+
+    .goals-header .title {
+        font-size: 28px;
+        font-weight: 700;
+        color: var(--text-white);
+    }
+
+    .goals-header .breadcrumb {
+        font-size: 13px;
+        color: var(--text-muted);
+    }
+    .goals-header .breadcrumb span {
+        color: var(--gold);
+    }
+
+    .goals-header .toolbar {
+        display: flex;
+        gap: 12px;
+        align-items: center;
+        flex-wrap: wrap;
+    }
+
+    .goals-header .toolbar .btn-new {
+        padding: 8px 20px;
+        background: var(--gold);
+        color: var(--dark-bg);
+        border: none;
+        border-radius: 6px;
+        font-weight: 600;
+        font-size: 13px;
+        cursor: pointer;
+        font-family: 'Inter', sans-serif;
+        transition: opacity 0.2s;
+    }
+    .goals-header .toolbar .btn-new:hover {
+        opacity: 0.85;
+    }
+
+    /* ─── Columns ─── */
+    .goals-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 16px;
+        margin-bottom: 24px;
+    }
+
+    .goal-column {
+        background: var(--panel-dark);
+        border-radius: 10px;
+        border: 1px solid var(--border-subtle);
+        padding: 16px;
+        display: flex;
+        flex-direction: column;
+        min-height: 400px;
+    }
+
+    .goal-column .column-header {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        margin-bottom: 12px;
+    }
+    .goal-column .column-header .emoji {
+        font-size: 20px;
+    }
+    .goal-column .column-header .name {
+        font-size: 18px;
+        font-weight: 700;
+        color: var(--text-white);
+    }
+    .goal-column .column-header .status {
+        font-size: 12px;
+        color: var(--text-muted);
+        margin-left: auto;
+        background: rgba(255,255,255,0.04);
+        padding: 2px 10px;
+        border-radius: 12px;
+        border: 1px solid var(--border-subtle);
+    }
+
+    .goal-column .goal-list {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+    }
+
+    .goal-column .goal-list .goal-item {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 10px 12px;
+        background: rgba(255,255,255,0.02);
+        border-radius: 8px;
+        border: 1px solid var(--border-subtle);
+        transition: all 0.2s;
+        cursor: default;
+    }
+    .goal-column .goal-list .goal-item:hover {
+        background: rgba(255,255,255,0.04);
+        border-color: rgba(255,255,255,0.12);
+    }
+
+    .goal-column .goal-list .goal-item .goal-emoji {
+        font-size: 16px;
+    }
+    .goal-column .goal-list .goal-item .goal-title {
+        flex: 1;
+        font-size: 14px;
+        color: var(--text-secondary);
+    }
+    .goal-column .goal-list .goal-item .goal-title.done {
+        text-decoration: line-through;
+        color: var(--text-muted);
+    }
+    .goal-column .goal-list .goal-item .goal-check {
+        width: 18px;
+        height: 18px;
+        border-radius: 4px;
+        border: 1.5px solid var(--border-subtle);
+        background: transparent;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 12px;
+        transition: all 0.2s;
+        color: transparent;
+        flex-shrink: 0;
+    }
+    .goal-column .goal-list .goal-item .goal-check:hover {
+        border-color: var(--gold);
+    }
+    .goal-column .goal-list .goal-item .goal-check.done {
+        background: var(--success-green);
+        border-color: var(--success-green);
+        color: var(--dark-bg);
+    }
+
+    .goal-column .add-btn {
+        margin-top: 12px;
+        padding: 8px 12px;
+        border: 1px dashed var(--border-subtle);
+        border-radius: 6px;
+        background: transparent;
+        color: var(--text-muted);
+        font-size: 13px;
+        cursor: pointer;
+        transition: all 0.2s;
+        text-align: left;
+        font-family: 'Inter', sans-serif;
+        width: 100%;
+    }
+    .goal-column .add-btn:hover {
+        border-color: var(--gold);
+        color: var(--gold);
+        background: rgba(201,169,110,0.05);
+    }
+
+    .goal-column .completed-section {
+        margin-top: 16px;
+        border-top: 1px solid var(--border-subtle);
+        padding-top: 12px;
+    }
+    .goal-column .completed-section .completed-label {
+        font-size: 12px;
+        color: var(--text-muted);
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        margin-bottom: 8px;
+    }
+
+    .goal-column .completed-section .goal-item.completed-goal {
+        opacity: 0.6;
+    }
+    .goal-column .completed-section .goal-item.completed-goal .goal-title {
+        text-decoration: line-through;
+    }
+
+    /* ─── Analytics Section ─── */
+    .analytics-divider {
+        border-top: 2px solid var(--border-subtle);
+        margin: 20px 0;
+        display: flex;
+        align-items: center;
+        padding: 0 8px;
+    }
+    .analytics-divider .lock-label {
+        background: var(--panel-dark);
+        padding: 4px 16px;
+        border-radius: 20px;
+        font-size: 13px;
+        color: var(--text-muted);
+        border: 1px solid var(--border-subtle);
+        margin-left: auto;
+    }
+
+    .analytics-grid {
+        display: grid;
+        grid-template-columns: 1fr 2fr;
+        gap: 16px;
+        margin-bottom: 16px;
+    }
+
+    .analytics-card {
+        background: var(--panel-dark);
+        border-radius: 10px;
+        border: 1px solid var(--border-subtle);
+        padding: 16px 20px;
+    }
+
+    .analytics-card .card-title {
+        font-size: 14px;
+        font-weight: 600;
+        color: var(--text-muted);
+        margin-bottom: 12px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+    .analytics-card .card-title .dropdown {
+        font-size: 12px;
+        color: var(--text-muted);
+        background: rgba(255,255,255,0.04);
+        padding: 2px 10px;
+        border-radius: 4px;
+        border: 1px solid var(--border-subtle);
+        cursor: pointer;
+    }
+
+    .progress-ring-container {
+        display: flex;
+        align-items: center;
+        gap: 20px;
+    }
+    .progress-ring {
+        position: relative;
+        width: 100px;
+        height: 100px;
+    }
+    .progress-ring svg {
+        transform: rotate(-90deg);
+        width: 100px;
+        height: 100px;
+    }
+    .progress-ring svg .bg {
+        fill: none;
+        stroke: rgba(255,255,255,0.06);
+        stroke-width: 6;
+    }
+    .progress-ring svg .progress {
+        fill: none;
+        stroke: var(--gold);
+        stroke-width: 6;
+        stroke-linecap: round;
+        stroke-dasharray: 251.2;
+        stroke-dashoffset: 251.2;
+        transition: stroke-dashoffset 0.8s ease;
+    }
+    .progress-ring .percentage {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        font-size: 24px;
+        font-weight: 700;
+        color: var(--text-white);
+    }
+    .progress-ring .percentage .sub {
+        font-size: 12px;
+        color: var(--text-muted);
+        font-weight: 400;
+        display: block;
+        margin-top: 2px;
+    }
+
+    .progress-stats {
+        flex: 1;
+    }
+    .progress-stats .stat-row {
+        display: flex;
+        justify-content: space-between;
+        font-size: 14px;
+        padding: 4px 0;
+        color: var(--text-secondary);
+    }
+    .progress-stats .stat-row .value {
+        font-weight: 600;
+        color: var(--text-white);
+    }
+
+    /* Chart container */
+    .chart-container {
+        position: relative;
+        height: 200px;
+        width: 100%;
+    }
+
+    /* Habit Summary Table */
+    .habit-summary-table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 13px;
+        margin-top: 8px;
+    }
+    .habit-summary-table th {
+        text-align: left;
+        font-size: 10px;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        color: var(--text-muted);
+        font-weight: 600;
+        padding: 8px 6px;
+        border-bottom: 1px solid var(--border-subtle);
+    }
+    .habit-summary-table td {
+        padding: 6px;
+        color: var(--text-secondary);
+        border-bottom: 1px solid rgba(255,255,255,0.03);
+    }
+    .habit-summary-table tr:last-child td {
+        border-bottom: none;
+    }
+    .habit-summary-table .habit-cell {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+    }
+    .habit-summary-table .habit-cell .icon {
+        font-size: 14px;
+    }
+    .habit-summary-table .habit-cell .name {
+        font-weight: 500;
+        color: var(--text-white);
+    }
+    .habit-summary-table .success-rate {
+        font-weight: 600;
+    }
+    .habit-summary-table .success-rate.high {
+        color: var(--success-green);
+    }
+    .habit-summary-table .success-rate.medium {
+        color: var(--gold);
+    }
+    .habit-summary-table .success-rate.low {
+        color: var(--danger-red);
+    }
+    .habit-summary-table .streak {
+        color: var(--gold);
+        font-weight: 500;
+    }
+    .habit-summary-table .streak.best {
+        color: var(--success-green);
+    }
+
+    .analytics-bottom {
+        display: grid;
+        grid-template-columns: 1fr 1.5fr;
+        gap: 16px;
+        margin-bottom: 16px;
+    }
+
+    .analytics-bottom .analytics-card {
+        overflow-x: auto;
+    }
+
+    /* ─── Emoji Picker ─── */
+    .emoji-picker-wrapper {
+        position: relative;
+        display: inline-block;
+        width: 100%;
+    }
+
+    .emoji-picker-btn {
+        width: 100%;
+        padding: 9px 12px;
+        background: rgba(255,255,255,0.04);
+        border: 1px solid var(--border-subtle);
+        border-radius: 4px;
+        color: var(--text-white);
+        font-size: 24px;
+        text-align: left;
+        cursor: pointer;
+        font-family: 'Inter', sans-serif;
+        transition: border-color 0.2s;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+    .emoji-picker-btn:hover {
+        border-color: var(--gold);
+    }
+    .emoji-picker-btn .placeholder {
+        font-size: 14px;
+        color: var(--text-muted);
+        font-weight: 400;
+    }
+
+    .emoji-picker-popup {
+        display: none;
+        position: absolute;
+        top: calc(100% + 4px);
+        left: 0;
+        background: var(--panel-dark);
+        border: 1px solid var(--border-subtle);
+        border-radius: 8px;
+        padding: 12px;
+        z-index: 1001;
+        width: 280px;
+        max-height: 260px;
+        overflow-y: auto;
+        box-shadow: 0 12px 40px rgba(0,0,0,0.6);
+        grid-template-columns: repeat(7, 1fr);
+        gap: 4px;
+    }
+    .emoji-picker-popup.open {
+        display: grid;
+    }
+
+    .emoji-picker-popup .emoji-option {
+        font-size: 22px;
+        padding: 6px 4px;
+        text-align: center;
+        cursor: pointer;
+        border-radius: 4px;
+        transition: background 0.15s;
+        background: transparent;
+        border: none;
+        font-family: 'Inter', sans-serif;
+        line-height: 1.2;
+    }
+    .emoji-picker-popup .emoji-option:hover {
+        background: rgba(201,169,110,0.15);
+    }
+
+    /* Scrollbar for emoji picker */
+    .emoji-picker-popup::-webkit-scrollbar {
+        width: 4px;
+    }
+    .emoji-picker-popup::-webkit-scrollbar-track {
+        background: transparent;
+    }
+    .emoji-picker-popup::-webkit-scrollbar-thumb {
+        background: var(--border-subtle);
+        border-radius: 4px;
+    }
+
+    @media (max-width: 1024px) {
+        .goals-grid {
+            grid-template-columns: 1fr 1fr;
+        }
+        .analytics-grid {
+            grid-template-columns: 1fr;
+        }
+        .analytics-bottom {
+            grid-template-columns: 1fr;
+        }
+    }
+    @media (max-width: 768px) {
+        .goals-grid {
+            grid-template-columns: 1fr;
+        }
+        .goals-header {
+            flex-direction: column;
+            align-items: stretch;
+        }
+        .progress-ring-container {
+            flex-direction: column;
+            align-items: center;
+        }
+    }
+</style>
+
+<div class="goals-container">
+
+    <!-- Header -->
+    <div class="goals-header">
+        <div>
+            <div class="title">Goals</div>
+            <div class="breadcrumb">Year 2025 &gt; <span>Monthly Habit Trackers</span> &gt; January</div>
+        </div>
+        <div class="toolbar">
+            <button class="btn-new" onclick="openAddModal()">+ New Goal</button>
+        </div>
+    </div>
+
+    <!-- Columns -->
+    <div class="goals-grid">
+        <!-- Weekly Goals -->
+        <div class="goal-column" data-category="WEEKLY">
+            <div class="column-header">
+                <span class="emoji">🔥</span>
+                <span class="name">Weekly Goals</span>
+                <span class="status">Current</span>
+            </div>
+            <div class="goal-list">
+                {% for goal in weekly_goals %}
+                    {% if not goal.completed %}
+                        {% include 'goals/_goal_card.html' with goal=goal %}
+                    {% endif %}
+                {% endfor %}
+            </div>
+            <button class="add-btn" onclick="openAddModal('WEEKLY')">+ New Goal</button>
+
+            <div class="completed-section">
+                <div class="completed-label">Complete</div>
+                <div class="goal-list">
+                    {% for goal in weekly_goals %}
+                        {% if goal.completed %}
+                            {% include 'goals/_goal_card.html' with goal=goal completed=True %}
+                        {% endif %}
+                    {% endfor %}
+                </div>
+                <button class="add-btn" onclick="openAddModal('WEEKLY')">+ New Goal</button>
+            </div>
+        </div>
+
+        <!-- Monthly Goals -->
+        <div class="goal-column" data-category="MONTHLY">
+            <div class="column-header">
+                <span class="emoji">🔥</span>
+                <span class="name">Monthly Goals</span>
+                <span class="status">Current</span>
+            </div>
+            <div class="goal-list">
+                {% for goal in monthly_goals %}
+                    {% if not goal.completed %}
+                        {% include 'goals/_goal_card.html' with goal=goal %}
+                    {% endif %}
+                {% endfor %}
+            </div>
+            <button class="add-btn" onclick="openAddModal('MONTHLY')">+ New Goal</button>
+
+            <div class="completed-section">
+                <div class="completed-label">Complete</div>
+                <div class="goal-list">
+                    {% for goal in monthly_goals %}
+                        {% if goal.completed %}
+                            {% include 'goals/_goal_card.html' with goal=goal completed=True %}
+                        {% endif %}
+                    {% endfor %}
+                </div>
+                <button class="add-btn" onclick="openAddModal('MONTHLY')">+ New Goal</button>
+            </div>
+        </div>
+
+        <!-- Annual Goals -->
+        <div class="goal-column" data-category="ANNUAL">
+            <div class="column-header">
+                <span class="emoji">🔥</span>
+                <span class="name">Annual Goals</span>
+                <span class="status">Current</span>
+            </div>
+            <div class="goal-list">
+                {% for goal in annual_goals %}
+                    {% if not goal.completed %}
+                        {% include 'goals/_goal_card.html' with goal=goal %}
+                    {% endif %}
+                {% endfor %}
+            </div>
+            <button class="add-btn" onclick="openAddModal('ANNUAL')">+ New Goal</button>
+
+            <div class="completed-section">
+                <div class="completed-label">Complete</div>
+                <div class="goal-list">
+                    {% for goal in annual_goals %}
+                        {% if goal.completed %}
+                            {% include 'goals/_goal_card.html' with goal=goal completed=True %}
+                        {% endif %}
+                    {% endfor %}
+                </div>
+                <button class="add-btn" onclick="openAddModal('ANNUAL')">+ New Goal</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ─── Analytics Section ─── -->
+    
+
+    <!-- Row 1: Overall Progress + Line Chart -->
+    <div class="analytics-grid">
+        <!-- Overall Progress -->
+        <div class="analytics-card">
+            <div class="card-title">Overall Progress</div>
+            <div class="progress-ring-container">
+                <div class="progress-ring">
+                    <svg viewBox="0 0 100 100">
+                        <circle class="bg" cx="50" cy="50" r="40"/>
+                        <circle class="progress" cx="50" cy="50" r="40"
+                            style="stroke-dashoffset: {{ overall_percentage|add:'0'|floatformat:'0' }}%;"/>
+                    </svg>
+                    <div class="percentage">
+                        {{ overall_percentage }}%
+                        <span class="sub">Overall</span>
+                    </div>
+                </div>
+                <div class="progress-stats">
+                    <div class="stat-row">
+                        <span>Total Completion</span>
+                        <span class="value">{{ overall_percentage }}% ({{ completed_goals }}/{{ total_goals }})</span>
+                    </div>
+                    <div class="stat-row">
+                        <span>Weekly Goals</span>
+                        <span class="value">{{ weekly_stats.percentage }}%</span>
+                    </div>
+                    <div class="stat-row">
+                        <span>Monthly Goals</span>
+                        <span class="value">{{ monthly_stats.percentage }}%</span>
+                    </div>
+                    <div class="stat-row">
+                        <span>Annual Goals</span>
+                        <span class="value">{{ annual_stats.percentage }}%</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Line Chart -->
+        <div class="analytics-card">
+            <div class="card-title">
+                <span>Progress Line Chart</span>
+                <span class="dropdown">Month</span>
+            </div>
+            <div class="chart-container">
+                <canvas id="progressLineChart"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <!-- Row 2: Monthly Progress + Habit Summary -->
+    <div class="analytics-bottom">
+        <!-- Monthly Progress (Doughnut) -->
+        <div class="analytics-card">
+            <div class="card-title">
+                <span>Monthly Progress</span>
+                <span class="dropdown">Pie Chart</span>
+            </div>
+            <div style="display: flex; align-items: center; gap: 24px; flex-wrap: wrap;">
+                <div style="position: relative; width: 120px; height: 120px; flex-shrink: 0;">
+                    <canvas id="monthlyPieChart"></canvas>
+                </div>
+                <div>
+                    <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 4px;">
+                        <span style="display: inline-block; width: 12px; height: 12px; background: var(--gold); border-radius: 2px;"></span>
+                        <span style="color: var(--text-secondary); font-size: 13px;">Completed: {{ monthly_habit_percentage }}%</span>
+                    </div>
+                    <div style="display: flex; align-items: center; gap: 8px;">
+                        <span style="display: inline-block; width: 12px; height: 12px; background: rgba(255,255,255,0.1); border-radius: 2px;"></span>
+                        <span style="color: var(--text-secondary); font-size: 13px;">Remaining: {{ 100|add:monthly_habit_percentage|add:-1 }}%</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Habit Summary Table -->
+        <div class="analytics-card">
+            <div class="card-title">Habit Summary</div>
+            <table class="habit-summary-table">
+                <thead>
+                    <tr>
+                        <th>Habit</th>
+                        <th>Completed</th>
+                        <th>Total</th>
+                        <th>Success Rate</th>
+                        <th>Current Streak</th>
+                        <th>Longest Streak</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for stat in habit_summary %}
+                    <tr>
+                        <td>
+                            <div class="habit-cell">
+                                <span class="icon">{{ stat.habit.icon }}</span>
+                                <span class="name">{{ stat.habit.name }}</span>
+                            </div>
+                        </td>
+                        <td>{{ stat.completed }}</td>
+                        <td>{{ stat.total }}</td>
+                        <td>
+                            <span class="success-rate
+                                {% if stat.success_rate >= 70 %}high
+                                {% elif stat.success_rate >= 40 %}medium
+                                {% else %}low{% endif %}">
+                                {{ stat.success_rate }}%
+                            </span>
+                        </td>
+                        <td><span class="streak">{{ stat.current_streak }} day{% if stat.current_streak != 1 %}s{% endif %}</span></td>
+                        <td><span class="streak best">{{ stat.longest_streak }} day{% if stat.longest_streak != 1 %}s{% endif %}</span></td>
+                    </tr>
+                    {% empty %}
+                    <tr><td colspan="6" style="text-align:center; color:var(--text-muted); padding:16px;">No habits yet. Create habits to see summary.</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <div class="weekly-footer" style="display:flex; justify-content:center; gap:20px; padding:12px 0; border-top:1px solid var(--border-subtle);">
+        <a href="{% url 'dashboard:home' %}" style="color:var(--text-muted); text-decoration:none; font-size:12px;">← Back to Dashboard</a>
+        <span style="color:var(--border-subtle);">|</span>
+        <a href="{% url 'accounts:logout' %}" style="color:var(--danger-red); text-decoration:none; font-size:12px;">Sign Out</a>
+    </div>
+</div>
+
+<!-- ─── Add Goal Modal ─── -->
+<div class="modal-overlay" id="addGoalModal" style="display:none; position:fixed; top:0; left:0; right:0; bottom:0; background:rgba(0,0,0,0.6); backdrop-filter:blur(4px); z-index:1000; align-items:center; justify-content:center;">
+    <div class="modal" style="background:var(--panel-dark); border-radius:8px; padding:28px 32px; max-width:480px; width:90%; border:1px solid var(--border-subtle); box-shadow:0 20px 60px rgba(0,0,0,0.5); max-height:90vh; overflow-y:auto;">
+        <div class="modal-header" style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
+            <h2 style="font-size:18px; font-weight:700; color:var(--text-white); margin:0;">Add New Goal</h2>
+            <button onclick="closeModal()" style="background:none; border:none; color:var(--text-muted); font-size:22px; cursor:pointer;">✕</button>
+        </div>
+        <form id="addGoalForm">
+            {% csrf_token %}
+
+            <!-- Emoji Picker (Grid-style emoji box) -->
+            <div class="form-group" style="margin-bottom:14px;">
+                <label style="display:block; font-size:10px; font-weight:600; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.5px; margin-bottom:4px;">Emoji</label>
+                <div class="emoji-picker-wrapper">
+                    <button type="button" class="emoji-picker-btn" id="emojiPickerBtn" onclick="toggleEmojiPicker()">
+                        <span id="selectedEmoji">📌</span>
+                        <span class="placeholder">Choose an emoji</span>
+                        <span style="margin-left:auto; font-size:12px; color:var(--text-muted);">▾</span>
+                    </button>
+                    <div class="emoji-picker-popup" id="emojiPickerPopup">
+                        <!-- Emojis will be injected by JavaScript -->
+                    </div>
+                </div>
+                <input type="hidden" name="emoji" id="id_emoji" value="📌">
+                <div style="font-size:10px; color:var(--text-muted); margin-top:3px;">Click the emoji to choose a different one</div>
+            </div>
+
+            <!-- Goal Name -->
+            <div class="form-group" style="margin-bottom:14px;">
+                <label style="display:block; font-size:10px; font-weight:600; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.5px; margin-bottom:4px;">Goal Name</label>
+                <input type="text" name="title" id="id_title" placeholder="Enter goal..." style="width:100%; padding:9px 12px; background:rgba(255,255,255,0.04); border:1px solid var(--border-subtle); border-radius:4px; color:var(--text-white); font-size:14px; outline:none; font-family:'Inter',sans-serif; box-sizing:border-box;">
+            </div>
+
+            <!-- Category Dropdown (Fixed Dark Theme) -->
+            <div class="form-group" style="margin-bottom:14px;">
+                <label style="display:block; font-size:10px; font-weight:600; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.5px; margin-bottom:4px;">Category</label>
+                <select name="category" id="id_category" style="width:100%; padding:9px 12px; background:rgba(255,255,255,0.04); border:1px solid var(--border-subtle); border-radius:4px; color:var(--text-white); font-size:14px; outline:none; font-family:'Inter',sans-serif; box-sizing:border-box; appearance:none; -webkit-appearance:none; background-image:url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 12 12"><path fill="%23A0A0A0" d="M6 8L1 3h10z"/></svg>'); background-repeat:no-repeat; background-position:right 12px center; padding-right:36px; cursor:pointer;">
+                    <option value="WEEKLY" style="background:#242424; color:#fff;">Weekly Goals</option>
+                    <option value="MONTHLY" style="background:#242424; color:#fff;">Monthly Goals</option>
+                    <option value="ANNUAL" style="background:#242424; color:#fff;">Annual Goals</option>
+                </select>
+            </div>
+
+            <!-- Description -->
+            <div class="form-group" style="margin-bottom:14px;">
+                <label style="display:block; font-size:10px; font-weight:600; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.5px; margin-bottom:4px;">Description</label>
+                <textarea name="description" id="id_description" rows="2" placeholder="Add details..." style="width:100%; padding:9px 12px; background:rgba(255,255,255,0.04); border:1px solid var(--border-subtle); border-radius:4px; color:var(--text-white); font-size:14px; outline:none; font-family:'Inter',sans-serif; box-sizing:border-box; resize:vertical; min-height:50px;"></textarea>
+            </div>
+
+            <div class="form-actions" style="display:flex; gap:10px; margin-top:8px;">
+                <button type="submit" class="btn-submit" style="flex:1; padding:10px; background:var(--gold); color:var(--dark-bg); border:none; border-radius:4px; font-size:14px; font-weight:700; cursor:pointer; font-family:'Inter',sans-serif;">Add Goal</button>
+                <button type="button" onclick="closeModal()" style="padding:10px 20px; background:transparent; border:1px solid var(--border-subtle); border-radius:4px; color:var(--text-muted); font-size:14px; font-weight:600; cursor:pointer; font-family:'Inter',sans-serif;">Cancel</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+    // ─── Emoji List ───
+    const EMOJIS = [
+        '📌', '🎯', '🏆', '⭐', '🔥', '💪', '📚', '🏃', '📄', '🚭',
+        '📗', '💰', '🪙', '📈', '✈️', '🎓', '🗺️', '💎', '🌟', '🎨',
+        '🧠', '💡', '🌱', '🌿', '🌳', '🌈', '⚡', '💫', '🎵', '✍️',
+        '🧘', '🙏', '💧', '🥗', '🌙', '☀️', '💤', '💎', '🎯', '🎪',
+        '🏅', '🎖️', '🥇', '🥈', '🥉', '🏀', '⚽', '🎾', '🏐', '🎱',
+        '🧩', '🎲', '🎮', '🎯', '🏹', '🎣', '🎽', '🏊', '🚴', '🧗',
+        '🏔️', '🌋', '🏝️', '🏜️', '🌄', '🌅', '🌇', '🌃', '🌌', '🎆',
+        '🎇', '🧨', '🎉', '🎊', '🎈', '🎁', '🎀', '🎗️', '🎟️', '🎫'
+    ];
+
+    // ─── Emoji Picker ───
+    let emojiPickerOpen = false;
+
+    function toggleEmojiPicker() {
+        const popup = document.getElementById('emojiPickerPopup');
+        if (emojiPickerOpen) {
+            popup.classList.remove('open');
+            emojiPickerOpen = false;
+        } else {
+            popup.classList.add('open');
+            emojiPickerOpen = true;
+        }
+    }
+
+    function selectEmoji(emoji) {
+        document.getElementById('selectedEmoji').textContent = emoji;
+        document.getElementById('id_emoji').value = emoji;
+        document.getElementById('emojiPickerPopup').classList.remove('open');
+        emojiPickerOpen = false;
+    }
+
+    // Close emoji picker on outside click
+    document.addEventListener('click', function(e) {
+        const wrapper = document.querySelector('.emoji-picker-wrapper');
+        if (wrapper && !wrapper.contains(e.target)) {
+            document.getElementById('emojiPickerPopup').classList.remove('open');
+            emojiPickerOpen = false;
+        }
+    });
+
+    // Populate emoji picker
+    document.addEventListener('DOMContentLoaded', function() {
+        const popup = document.getElementById('emojiPickerPopup');
+        EMOJIS.forEach(function(emoji) {
+            const btn = document.createElement('button');
+            btn.type = 'button';
+            btn.className = 'emoji-option';
+            btn.textContent = emoji;
+            btn.onclick = function() { selectEmoji(emoji); };
+            popup.appendChild(btn);
+        });
+    });
+
+    // ─── Modal Functions ───
+    function openAddModal(category) {
+        const modal = document.getElementById('addGoalModal');
+        modal.style.display = 'flex';
+        document.body.style.overflow = 'hidden';
+        if (category) {
+            document.getElementById('id_category').value = category;
+        }
+    }
+
+    function closeModal() {
+        document.getElementById('addGoalModal').style.display = 'none';
+        document.body.style.overflow = '';
+    }
+
+    document.getElementById('addGoalModal').addEventListener('click', function(e) {
+        if (e.target === this) closeModal();
+    });
+
+    // ─── Goal Toggle ───
+    function toggleGoal(btn, goalId) {
+        const wasDone = btn.classList.contains('done');
+        const card = btn.closest('.goal-item');
+        const titleEl = card.querySelector('.goal-title');
+
+        if (wasDone) {
+            btn.classList.remove('done');
+            btn.textContent = '';
+            titleEl.classList.remove('done');
+        } else {
+            btn.classList.add('done');
+            btn.textContent = '✓';
+            titleEl.classList.add('done');
+        }
+
+        const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]')?.value ||
+                          document.querySelector('input[name="csrfmiddlewaretoken"]')?.value;
+
+        fetch(`/goals/toggle/${goalId}/`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': csrftoken || '{{ csrf_token }}'
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                if (data.completed) {
+                    btn.classList.add('done');
+                    btn.textContent = '✓';
+                    titleEl.classList.add('done');
+                } else {
+                    btn.classList.remove('done');
+                    btn.textContent = '';
+                    titleEl.classList.remove('done');
+                }
+                location.reload();
+            } else {
+                if (wasDone) {
+                    btn.classList.add('done');
+                    btn.textContent = '✓';
+                    titleEl.classList.add('done');
+                } else {
+                    btn.classList.remove('done');
+                    btn.textContent = '';
+                    titleEl.classList.remove('done');
+                }
+                alert('Error: ' + (data.error || 'Failed to update goal'));
+            }
+        })
+        .catch(error => {
+            if (wasDone) {
+                btn.classList.add('done');
+                btn.textContent = '✓';
+                titleEl.classList.add('done');
+            } else {
+                btn.classList.remove('done');
+                btn.textContent = '';
+                titleEl.classList.remove('done');
+            }
+            alert('Failed to update goal. Please try again.');
+        });
+    }
+
+    // ─── Add Goal Form ───
+    document.getElementById('addGoalForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+        const formData = new FormData(this);
+        const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]')?.value ||
+                          document.querySelector('input[name="csrfmiddlewaretoken"]')?.value;
+
+        fetch('/goals/add/', {
+            method: 'POST',
+            body: formData,
+            headers: {
+                'X-CSRFToken': csrftoken || '{{ csrf_token }}'
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                closeModal();
+                location.reload();
+            } else {
+                alert('Error: ' + JSON.stringify(data.errors));
+            }
+        })
+        .catch(error => {
+            alert('Failed to add goal. Please try again.');
+        });
+    });
+
+    // ─── Charts ───
+    document.addEventListener('DOMContentLoaded', function() {
+        // Line Chart
+        const lineCtx = document.getElementById('progressLineChart').getContext('2d');
+        const labels = {{ chart_dates|safe }};
+        const data = {{ chart_data|safe }};
+
+        new Chart(lineCtx, {
+            type: 'line',
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: 'Daily Progress',
+                    data: data,
+                    borderColor: '#C9A96E',
+                    backgroundColor: 'rgba(201,169,110,0.1)',
+                    fill: true,
+                    tension: 0.3,
+                    pointBackgroundColor: '#C9A96E',
+                    pointBorderColor: '#C9A96E',
+                    pointRadius: 2,
+                    pointHoverRadius: 4,
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { display: false }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        max: 100,
+                        ticks: {
+                            callback: function(value) { return value + '%'; },
+                            color: 'rgba(255,255,255,0.3)',
+                            font: { size: 10 }
+                        },
+                        grid: { color: 'rgba(255,255,255,0.05)' }
+                    },
+                    x: {
+                        ticks: {
+                            color: 'rgba(255,255,255,0.3)',
+                            font: { size: 10 },
+                            maxRotation: 30,
+                            autoSkip: true,
+                            maxTicksLimit: 15
+                        },
+                        grid: { display: false }
+                    }
+                }
+            }
+        });
+
+        // Doughnut Chart (Monthly Progress)
+        const pieCtx = document.getElementById('monthlyPieChart').getContext('2d');
+        const completedPct = {{ monthly_habit_percentage }};
+        const remainingPct = 100 - completedPct;
+
+        new Chart(pieCtx, {
+            type: 'doughnut',
+            data: {
+                labels: ['Completed', 'Remaining'],
+                datasets: [{
+                    data: [completedPct, remainingPct],
+                    backgroundColor: ['#C9A96E', 'rgba(255,255,255,0.1)'],
+                    borderColor: ['#C9A96E', 'rgba(255,255,255,0.1)'],
+                    borderWidth: 1,
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { display: false }
+                },
+                cutout: '70%',
+            }
+        });
+    });
+</script>
+{% endblock %}

@@ -1,0 +1,1032 @@
+{% extends 'dashboard/base.html' %}
+{% load static %}
+
+{% block title %}Weekly Tasks - IKIGAI{% endblock %}
+
+{% block content %}
+<style>
+    /* Hide scrollbar */
+    ::-webkit-scrollbar {
+        display: none;
+    }
+    * {
+        scrollbar-width: none;
+    }
+    body {
+        -ms-overflow-style: none;
+    }
+
+    /* ─── Remove margins from base container ─── */
+    .container {
+        max-width: 100% !important;
+        padding: 0 !important;
+        margin: 0 !important;
+    }
+
+    .weekly-container {
+        max-width: 100%;
+        padding: 0 80px;  /* Reduced padding to 0 */
+        margin: 0 auto;
+    }
+
+    /* ─── Header ─── */
+    .weekly-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 12px 16px;
+        border-bottom: 2px solid var(--border-subtle);
+        margin-bottom: 16px;
+        flex-wrap: wrap;
+        gap: 12px;
+    }
+
+    .weekly-header .left {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+    }
+
+    .weekly-header .left .week-range {
+        font-size: 14px;
+        color: var(--text-muted);
+    }
+
+    .weekly-header .left .week-range strong {
+        color: var(--text-white);
+    }
+
+    .weekly-header .center {
+        font-size: 20px;
+        font-weight: 700;
+        color: var(--gold);
+        letter-spacing: 2px;
+        text-transform: uppercase;
+    }
+
+    .weekly-header .right {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+    }
+
+    .weekly-header .right .nav-btn {
+        padding: 4px 12px;
+        background: rgba(255,255,255,0.04);
+        border: 1px solid var(--border-subtle);
+        border-radius: 4px;
+        color: var(--text-muted);
+        text-decoration: none;
+        font-size: 13px;
+        transition: all 0.2s;
+    }
+
+    .weekly-header .right .nav-btn:hover {
+        background: rgba(255,255,255,0.08);
+        color: var(--text-white);
+    }
+
+    .weekly-header .right .btn-add {
+        padding: 8px 20px;
+        background: var(--gold);
+        color: var(--dark-bg);
+        border: none;
+        border-radius: 4px;
+        font-weight: 600;
+        font-size: 13px;
+        cursor: pointer;
+        transition: all 0.2s;
+        font-family: 'Inter', sans-serif;
+    }
+
+    .weekly-header .right .btn-add:hover {
+        opacity: 0.85;
+        transform: translateY(-1px);
+    }
+
+    /* ─── Main Grid ─── */
+    .weekly-grid {
+        display: grid;
+        grid-template-columns: repeat(7, 1fr);
+        gap: 0;
+        border: 1px solid var(--border-subtle);
+        border-radius: 6px;
+        overflow: hidden;
+        margin: 0 16px 20px 16px;  /* Only side margin for the grid itself */
+        background: var(--panel-dark);
+    }
+
+    .weekly-grid .day-column {
+        border-right: 1px solid var(--border-subtle);
+        display: flex;
+        flex-direction: column;
+        min-height: 500px;
+    }
+
+    .weekly-grid .day-column:last-child {
+        border-right: none;
+    }
+
+    /* ─── Day Header ─── */
+    .weekly-grid .day-column .day-header {
+        background: var(--gold);
+        padding: 10px 8px 8px 8px;
+        text-align: center;
+        color: var(--dark-bg);
+        flex-shrink: 0;
+    }
+
+    .weekly-grid .day-column .day-header .day-name {
+        font-size: 14px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    .weekly-grid .day-column .day-header .day-date {
+        font-size: 11px;
+        font-weight: 500;
+        opacity: 0.8;
+        margin-top: 2px;
+    }
+
+    /* ─── Progress Circle ─── */
+    .weekly-grid .day-column .progress-section {
+        padding: 12px 8px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        flex-shrink: 0;
+        border-bottom: 1px solid var(--border-subtle);
+    }
+
+    .progress-ring {
+        position: relative;
+        width: 60px;
+        height: 60px;
+    }
+
+    .progress-ring svg {
+        transform: rotate(-90deg);
+        width: 60px;
+        height: 60px;
+    }
+
+    .progress-ring svg .bg {
+        fill: none;
+        stroke: rgba(255,255,255,0.06);
+        stroke-width: 4;
+    }
+
+    .progress-ring svg .progress {
+        fill: none;
+        stroke: var(--gold);
+        stroke-width: 4;
+        stroke-linecap: round;
+        stroke-dasharray: 157.08;
+        stroke-dashoffset: 157.08;
+        transition: stroke-dashoffset 0.5s ease;
+    }
+
+    .progress-ring .percentage {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        font-size: 15px;
+        font-weight: 700;
+        color: var(--text-white);
+    }
+
+    .progress-ring .percentage.complete {
+        color: var(--success-green);
+    }
+
+    /* ─── Task List ─── */
+    .weekly-grid .day-column .task-list-section {
+        flex: 1;
+        padding: 6px 8px;
+        overflow-y: auto;
+        min-height: 200px;
+    }
+
+    .weekly-grid .day-column .task-list-section .tasks-label {
+        font-size: 9px;
+        font-weight: 600;
+        color: var(--gold);
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        margin-bottom: 6px;
+        padding-bottom: 4px;
+        border-bottom: 1px solid var(--border-subtle);
+    }
+
+    .weekly-grid .day-column .task-list-section .task-item {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        padding: 4px 0;
+        border-bottom: 1px solid rgba(255,255,255,0.03);
+        font-size: 12px;
+        color: var(--text-secondary);
+    }
+
+    .weekly-grid .day-column .task-list-section .task-item:last-child {
+        border-bottom: none;
+    }
+
+    .weekly-grid .day-column .task-list-section .task-item .task-check {
+        width: 16px;
+        height: 16px;
+        border-radius: 3px;
+        border: 1.5px solid var(--border-subtle);
+        background: transparent;
+        cursor: pointer;
+        flex-shrink: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 10px;
+        transition: all 0.2s;
+        color: transparent;
+        margin-top: 1px;
+    }
+
+    .weekly-grid .day-column .task-list-section .task-item .task-check:hover {
+        border-color: var(--gold);
+    }
+
+    .weekly-grid .day-column .task-list-section .task-item .task-check.done {
+        background: var(--success-green);
+        border-color: var(--success-green);
+        color: var(--dark-bg);
+    }
+
+    .weekly-grid .day-column .task-list-section .task-item .task-check .high-priority {
+        border-color: var(--danger-red);
+    }
+
+    .weekly-grid .day-column .task-list-section .task-item .task-name {
+        font-size: 12px;
+        color: var(--text-secondary);
+        flex: 1;
+        word-break: break-word;
+    }
+
+    .weekly-grid .day-column .task-list-section .task-item .task-name.done {
+        text-decoration: line-through;
+        color: var(--text-muted);
+    }
+
+    .weekly-grid .day-column .task-list-section .task-item .priority-dot {
+        width: 6px;
+        height: 6px;
+        border-radius: 50%;
+        flex-shrink: 0;
+    }
+
+    .weekly-grid .day-column .task-list-section .task-item .priority-dot.high {
+        background: var(--danger-red);
+    }
+
+    .weekly-grid .day-column .task-list-section .task-item .priority-dot.medium {
+        background: var(--gold);
+    }
+
+    .weekly-grid .day-column .task-list-section .task-item .priority-dot.low {
+        background: var(--success-green);
+    }
+
+    .weekly-grid .day-column .task-list-section .empty-tasks {
+        text-align: center;
+        color: var(--text-muted);
+        font-size: 11px;
+        padding: 16px 0;
+        opacity: 0.5;
+    }
+
+    /* ─── Day Footer ─── */
+    .weekly-grid .day-column .day-footer {
+        background: rgba(201,169,110,0.08);
+        padding: 8px 10px;
+        border-top: 1px solid var(--border-subtle);
+        display: flex;
+        justify-content: space-between;
+        font-size: 11px;
+        flex-shrink: 0;
+    }
+
+    .weekly-grid .day-column .day-footer .stat-item {
+        text-align: center;
+    }
+
+    .weekly-grid .day-column .day-footer .stat-item .stat-label {
+        font-size: 8px;
+        text-transform: uppercase;
+        color: var(--text-muted);
+        letter-spacing: 0.3px;
+    }
+
+    .weekly-grid .day-column .day-footer .stat-item .stat-value {
+        font-weight: 700;
+        color: var(--text-white);
+        font-size: 14px;
+    }
+
+    .weekly-grid .day-column .day-footer .stat-item .stat-value.completed {
+        color: var(--success-green);
+    }
+
+    .weekly-grid .day-column .day-footer .stat-item .stat-value.not-done {
+        color: var(--text-muted);
+    }
+
+    /* ─── Bottom Analytics ─── */
+    .bottom-analytics {
+        display: grid;
+        grid-template-columns: 1fr 1fr 1fr;
+        gap: 16px;
+        margin: 0 16px 20px 16px;
+    }
+
+    .analytics-panel {
+        background: var(--panel-dark);
+        border-radius: 6px;
+        padding: 16px 20px;
+        border: 1px solid var(--border-subtle);
+    }
+
+    .analytics-panel h4 {
+        font-size: 10px;
+        font-weight: 700;
+        color: var(--text-muted);
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        margin-bottom: 10px;
+        border-bottom: 1px solid var(--border-subtle);
+        padding-bottom: 6px;
+    }
+
+    .analytics-panel .summary-row {
+        display: flex;
+        justify-content: space-between;
+        font-size: 13px;
+        padding: 3px 0;
+        color: var(--text-secondary);
+    }
+
+    .analytics-panel .summary-row .value {
+        font-weight: 600;
+        color: var(--text-white);
+    }
+
+    .analytics-panel .summary-row .value.gold {
+        color: var(--gold);
+    }
+
+    .analytics-panel .summary-row .value.green {
+        color: var(--success-green);
+    }
+
+    .analytics-panel .progress-item {
+        margin-bottom: 8px;
+    }
+
+    .analytics-panel .progress-item:last-child {
+        margin-bottom: 0;
+    }
+
+    .analytics-panel .progress-item .progress-label {
+        display: flex;
+        justify-content: space-between;
+        font-size: 12px;
+        color: var(--text-secondary);
+        margin-bottom: 2px;
+    }
+
+    .analytics-panel .progress-item .progress-label .label {
+        font-weight: 500;
+    }
+
+    .analytics-panel .progress-item .progress-label .pct {
+        font-weight: 600;
+        color: var(--text-white);
+    }
+
+    .analytics-panel .progress-item .progress-track {
+        height: 4px;
+        background: rgba(255,255,255,0.06);
+        border-radius: 4px;
+        overflow: hidden;
+    }
+
+    .analytics-panel .progress-item .progress-track .fill {
+        height: 100%;
+        border-radius: 4px;
+        transition: width 0.5s ease;
+    }
+
+    .analytics-panel .progress-item .progress-track .fill.high {
+        background: var(--danger-red);
+    }
+
+    .analytics-panel .progress-item .progress-track .fill.medium {
+        background: var(--gold);
+    }
+
+    .analytics-panel .progress-item .progress-track .fill.low {
+        background: var(--success-green);
+    }
+
+    .analytics-panel .quote-text {
+        font-size: 13px;
+        color: var(--text-secondary);
+        font-style: italic;
+        line-height: 1.5;
+        padding: 4px 0;
+    }
+
+    .analytics-panel .quote-author {
+        font-size: 12px;
+        color: var(--text-muted);
+        text-align: right;
+        margin-top: 6px;
+        font-style: normal;
+    }
+
+    /* ─── Add Task Modal ─── */
+    .modal-overlay {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0,0,0,0.6);
+        backdrop-filter: blur(4px);
+        z-index: 1000;
+        align-items: center;
+        justify-content: center;
+        animation: fadeIn 0.2s ease;
+    }
+
+    .modal-overlay.active {
+        display: flex;
+    }
+
+    .modal-overlay .modal {
+        background: var(--panel-dark);
+        border-radius: 8px;
+        padding: 28px 32px;
+        max-width: 480px;
+        width: 90%;
+        border: 1px solid var(--border-subtle);
+        box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+        max-height: 90vh;
+        overflow-y: auto;
+    }
+
+    .modal-overlay .modal .modal-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 20px;
+    }
+
+    .modal-overlay .modal .modal-header h2 {
+        font-size: 18px;
+        font-weight: 700;
+        color: var(--text-white);
+        margin: 0;
+    }
+
+    .modal-overlay .modal .modal-header .close-btn {
+        background: none;
+        border: none;
+        color: var(--text-muted);
+        font-size: 22px;
+        cursor: pointer;
+        padding: 0 4px;
+        transition: color 0.2s;
+    }
+
+    .modal-overlay .modal .modal-header .close-btn:hover {
+        color: var(--text-white);
+    }
+
+    .modal-overlay .modal .form-group {
+        margin-bottom: 14px;
+    }
+
+    .modal-overlay .modal .form-group label {
+        display: block;
+        font-size: 10px;
+        font-weight: 600;
+        color: var(--text-muted);
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        margin-bottom: 4px;
+    }
+
+    .modal-overlay .modal .form-group input,
+    .modal-overlay .modal .form-group textarea,
+    .modal-overlay .modal .form-group select {
+        width: 100%;
+        padding: 9px 12px;
+        background: rgba(255,255,255,0.04);
+        border: 1px solid var(--border-subtle);
+        border-radius: 4px;
+        color: var(--text-white);
+        font-size: 14px;
+        transition: border-color 0.2s;
+        outline: none;
+        font-family: 'Inter', sans-serif;
+        box-sizing: border-box;
+    }
+
+    .modal-overlay .modal .form-group input:focus,
+    .modal-overlay .modal .form-group textarea:focus,
+    .modal-overlay .modal .form-group select:focus {
+        border-color: var(--gold);
+    }
+
+    .modal-overlay .modal .form-group textarea {
+        min-height: 50px;
+        resize: vertical;
+    }
+
+    .modal-overlay .modal .form-group select option {
+        background: var(--panel-dark);
+        color: var(--text-white);
+    }
+
+    .modal-overlay .modal .form-actions {
+        display: flex;
+        gap: 10px;
+        margin-top: 8px;
+    }
+
+    .modal-overlay .modal .form-actions .btn-submit {
+        flex: 1;
+        padding: 10px;
+        background: var(--gold);
+        color: var(--dark-bg);
+        border: none;
+        border-radius: 4px;
+        font-size: 14px;
+        font-weight: 700;
+        cursor: pointer;
+        transition: opacity 0.2s;
+        font-family: 'Inter', sans-serif;
+    }
+
+    .modal-overlay .modal .form-actions .btn-submit:hover {
+        opacity: 0.85;
+    }
+
+    .modal-overlay .modal .form-actions .btn-cancel {
+        padding: 10px 20px;
+        background: transparent;
+        border: 1px solid var(--border-subtle);
+        border-radius: 4px;
+        color: var(--text-muted);
+        font-size: 14px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: background 0.2s;
+        font-family: 'Inter', sans-serif;
+    }
+
+    .modal-overlay .modal .form-actions .btn-cancel:hover {
+        background: rgba(255,255,255,0.04);
+    }
+
+    /* ─── Footer ─── */
+    .weekly-footer {
+        display: flex;
+        justify-content: center;
+        gap: 20px;
+        padding: 12px 16px;
+        border-top: 1px solid var(--border-subtle);
+        margin-top: 4px;
+    }
+
+    .weekly-footer a {
+        color: var(--text-muted);
+        text-decoration: none;
+        font-size: 12px;
+    }
+
+    .weekly-footer a:hover {
+        color: var(--text-white);
+    }
+
+    /* ─── Animations ─── */
+    @keyframes fadeIn {
+        from { opacity: 0; transform: scale(0.96); }
+        to { opacity: 1; transform: scale(1); }
+    }
+
+    /* ─── Responsive ─── */
+    @media (max-width: 1024px) {
+        .weekly-grid {
+            overflow-x: auto;
+            display: block;
+            margin: 0 8px 20px 8px;
+        }
+        .weekly-grid .day-column {
+            min-width: 160px;
+            display: inline-block;
+            vertical-align: top;
+            border-right: 1px solid var(--border-subtle);
+            min-height: 400px;
+        }
+        .weekly-grid .day-column .task-list-section {
+            min-height: 150px;
+        }
+        .bottom-analytics {
+            grid-template-columns: 1fr 1fr;
+            margin: 0 8px 20px 8px;
+        }
+        .weekly-header {
+            padding: 12px 8px;
+        }
+    }
+
+    @media (max-width: 768px) {
+        .weekly-header {
+            flex-direction: column;
+            align-items: stretch;
+            gap: 8px;
+            padding: 12px 8px;
+        }
+        .weekly-header .left {
+            justify-content: center;
+        }
+        .weekly-header .center {
+            font-size: 16px;
+            text-align: center;
+        }
+        .weekly-header .right {
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+        .bottom-analytics {
+            grid-template-columns: 1fr;
+            margin: 0 8px 20px 8px;
+        }
+        .weekly-grid .day-column {
+            min-width: 140px;
+        }
+        .weekly-grid .day-column .day-header .day-name {
+            font-size: 12px;
+        }
+        .weekly-grid .day-column .task-list-section .task-item {
+            font-size: 11px;
+        }
+        .weekly-grid {
+            margin: 0 8px 20px 8px;
+        }
+    }
+
+    @media (max-width: 480px) {
+        .weekly-grid .day-column {
+            min-width: 120px;
+        }
+        .progress-ring {
+            width: 48px;
+            height: 48px;
+        }
+        .progress-ring svg {
+            width: 48px;
+            height: 48px;
+        }
+        .progress-ring .percentage {
+            font-size: 14px;
+        }
+        .weekly-grid .day-column .day-footer {
+            font-size: 10px;
+            flex-wrap: wrap;
+        }
+        .modal-overlay .modal {
+            padding: 20px;
+        }
+        .weekly-grid {
+            margin: 0 4px 16px 4px;
+        }
+        .bottom-analytics {
+            margin: 0 4px 16px 4px;
+        }
+        .weekly-header {
+            padding: 10px 4px;
+        }
+    }
+</style>
+
+<div class="weekly-container">
+
+    <!-- ─── Header ─── -->
+    <div class="weekly-header">
+        <div class="left">
+            <span class="week-range">
+                <strong>{{ monday|date:"d.m.Y" }}</strong> – <strong>{{ sunday|date:"d.m.Y" }}</strong>
+            </span>
+        </div>
+        <div class="center">Weekly Task Tracker</div>
+        <div class="right">
+            <a href="?week={{ week_offset|add:-1 }}" class="nav-btn">‹</a>
+            <a href="?week=0" class="nav-btn">Today</a>
+            <a href="?week={{ week_offset|add:1 }}" class="nav-btn">›</a>
+            <button class="btn-add" onclick="openModal()">+ Add Task</button>
+        </div>
+    </div>
+
+    <!-- ─── Grid ─── -->
+    <div class="weekly-grid">
+        {% for day_data in weekly_data %}
+        <div class="day-column">
+            <!-- Day Header -->
+            <div class="day-header">
+                <div class="day-name">{{ day_data.day_name }}</div>
+                <div class="day-date">{{ day_data.day|date:"d.m.Y" }}</div>
+            </div>
+
+            <!-- Progress Circle -->
+            <div class="progress-section">
+                <div class="progress-ring">
+                    <svg viewBox="0 0 60 60">
+                        <circle class="bg" cx="30" cy="30" r="25"/>
+                        <circle class="progress" cx="30" cy="30" r="25"
+                            style="stroke-dashoffset: {{ day_data.percentage|add:'0'|floatformat:'0' }}%;"/>
+                    </svg>
+                    <div class="percentage {% if day_data.percentage == 100 %}complete{% endif %}">
+                        {{ day_data.percentage }}%
+                    </div>
+                </div>
+            </div>
+
+            <!-- Task List -->
+            <div class="task-list-section">
+                <div class="tasks-label">Tasks</div>
+                {% if day_data.tasks %}
+                    {% for task in day_data.tasks %}
+                    <div class="task-item" data-task-id="{{ task.id }}">
+                        <button class="task-check {% if task.status == 'COMPLETED' %}done{% endif %}" 
+                                onclick="toggleTask(this, {{ task.id }})">
+                            {% if task.status == 'COMPLETED' %}✓{% endif %}
+                        </button>
+                        <span class="priority-dot {{ task.priority|lower }}"></span>
+                        <span class="task-name {% if task.status == 'COMPLETED' %}done{% endif %}">
+                            {{ task.title }}
+                        </span>
+                    </div>
+                    {% endfor %}
+                {% else %}
+                    <div class="empty-tasks">No tasks</div>
+                {% endif %}
+            </div>
+
+            <!-- Day Footer -->
+            <div class="day-footer">
+                <div class="stat-item">
+                    <div class="stat-label">Completed</div>
+                    <div class="stat-value completed">{{ day_data.completed }}</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-label">Not Done</div>
+                    <div class="stat-value not-done">{{ day_data.not_done }}</div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+    <!-- ─── Bottom Analytics ─── -->
+    <div class="bottom-analytics">
+        <!-- Weekly Summary -->
+        <div class="analytics-panel">
+            <h4>Weekly Summary</h4>
+            <div class="summary-row">
+                <span>Total Completed</span>
+                <span class="value green">{{ weekly_summary.total_completed }}</span>
+            </div>
+            <div class="summary-row">
+                <span>Total Not Done</span>
+                <span class="value">{{ weekly_summary.total_not_done }}</span>
+            </div>
+            <div class="summary-row">
+                <span>Total Tasks</span>
+                <span class="value gold">{{ weekly_summary.total_tasks }}</span>
+            </div>
+            <div class="summary-row" style="border-top: 1px solid var(--border-subtle); padding-top: 6px; margin-top: 4px;">
+                <span>Completion Rate</span>
+                <span class="value gold">{{ weekly_summary.completion_rate }}%</span>
+            </div>
+        </div>
+
+        <!-- Priority Breakdown -->
+        <div class="analytics-panel">
+            <h4>Priority Breakdown</h4>
+            <div class="progress-item">
+                <div class="progress-label">
+                    <span class="label">High</span>
+                    <span class="pct">{{ priority_breakdown.high.percentage }}%</span>
+                </div>
+                <div class="progress-track">
+                    <div class="fill high" style="width: {{ priority_breakdown.high.percentage }}%;"></div>
+                </div>
+            </div>
+            <div class="progress-item">
+                <div class="progress-label">
+                    <span class="label">Medium</span>
+                    <span class="pct">{{ priority_breakdown.medium.percentage }}%</span>
+                </div>
+                <div class="progress-track">
+                    <div class="fill medium" style="width: {{ priority_breakdown.medium.percentage }}%;"></div>
+                </div>
+            </div>
+            <div class="progress-item">
+                <div class="progress-label">
+                    <span class="label">Low</span>
+                    <span class="pct">{{ priority_breakdown.low.percentage }}%</span>
+                </div>
+                <div class="progress-track">
+                    <div class="fill low" style="width: {{ priority_breakdown.low.percentage }}%;"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Motivational Quote -->
+        <div class="analytics-panel">
+            <h4>Daily Wisdom</h4>
+            <div class="quote-text">"{{ quote.0 }}"</div>
+            <div class="quote-author">— {{ quote.1 }}</div>
+        </div>
+    </div>
+
+    <!-- ─── Footer ─── -->
+    <div class="weekly-footer">
+        <a href="{% url 'dashboard:home' %}">← Back to Dashboard</a>
+        <span style="color: var(--border-subtle);">|</span>
+        <a href="{% url 'accounts:logout' %}" style="color: var(--danger-red);">Sign Out</a>
+    </div>
+
+</div>
+
+<!-- ─── Add Task Modal ─── -->
+<div class="modal-overlay" id="addTaskModal">
+    <div class="modal">
+        <div class="modal-header">
+            <h2>Add New Task</h2>
+            <button class="close-btn" onclick="closeModal()">✕</button>
+        </div>
+        <form id="addTaskForm" method="POST" action="{% url 'tasks:add_weekly' %}">
+            {% csrf_token %}
+            <div class="form-group">
+                <label for="id_title">Task Name *</label>
+                {{ form.title }}
+            </div>
+            <div class="form-group">
+                <label for="id_description">Description (optional)</label>
+                {{ form.description }}
+            </div>
+            <div class="form-group">
+                <label for="id_priority">Priority</label>
+                {{ form.priority }}
+            </div>
+            <div class="form-group">
+                <label for="id_day">Which day?</label>
+                {{ form.day }}
+            </div>
+            <div class="form-actions">
+                <button type="submit" class="btn-submit">Add Task</button>
+                <button type="button" class="btn-cancel" onclick="closeModal()">Cancel</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+    // ─── Modal Functions ───
+    function openModal() {
+        document.getElementById('addTaskModal').classList.add('active');
+        document.body.style.overflow = 'hidden';
+    }
+
+    function closeModal() {
+        document.getElementById('addTaskModal').classList.remove('active');
+        document.body.style.overflow = '';
+    }
+
+    // Close modal on backdrop click
+    document.getElementById('addTaskModal').addEventListener('click', function(e) {
+        if (e.target === this) closeModal();
+    });
+
+    // Close modal on Escape
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape') closeModal();
+    });
+
+    // ─── Task Toggle ───
+    function toggleTask(btn, taskId) {
+        const wasDone = btn.classList.contains('done');
+        const taskItem = btn.closest('.task-item');
+        const taskName = taskItem.querySelector('.task-name');
+
+        // Optimistic UI update
+        if (wasDone) {
+            btn.classList.remove('done');
+            btn.textContent = '';
+            taskName.classList.remove('done');
+        } else {
+            btn.classList.add('done');
+            btn.textContent = '✓';
+            taskName.classList.add('done');
+        }
+
+        // Send request
+        const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]')?.value ||
+                         document.querySelector('input[name="csrfmiddlewaretoken"]')?.value;
+
+        fetch(`/tasks/toggle/${taskId}/`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': csrftoken || '{{ csrf_token }}'
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                // Update button state
+                if (data.completed) {
+                    btn.classList.add('done');
+                    btn.textContent = '✓';
+                    taskName.classList.add('done');
+                } else {
+                    btn.classList.remove('done');
+                    btn.textContent = '';
+                    taskName.classList.remove('done');
+                }
+                // Refresh to update stats
+                setTimeout(() => location.reload(), 400);
+            } else {
+                // Revert on error
+                if (wasDone) {
+                    btn.classList.add('done');
+                    btn.textContent = '✓';
+                    taskName.classList.add('done');
+                } else {
+                    btn.classList.remove('done');
+                    btn.textContent = '';
+                    taskName.classList.remove('done');
+                }
+                alert('Error: ' + (data.error || 'Failed to update task'));
+            }
+        })
+        .catch(error => {
+            // Revert on error
+            if (wasDone) {
+                btn.classList.add('done');
+                btn.textContent = '✓';
+                taskName.classList.add('done');
+            } else {
+                btn.classList.remove('done');
+                btn.textContent = '';
+                taskName.classList.remove('done');
+            }
+            console.error('Error:', error);
+            alert('Failed to update task. Please try again.');
+        });
+    }
+
+    // ─── Form Submission ───
+    document.getElementById('addTaskForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+        const form = this;
+        const formData = new FormData(form);
+
+        fetch(form.action, {
+            method: 'POST',
+            body: formData,
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest'
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                closeModal();
+                location.reload();
+            } else {
+                alert('Error: ' + JSON.stringify(data.errors));
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('Failed to add task. Please try again.');
+        });
+    });
+</script>
+{% endblock %}

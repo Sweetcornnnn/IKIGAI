@@ -1,0 +1,10 @@
+{% load static %}
+
+<div class="goal-item {% if completed %}completed-goal{% endif %}">
+    <span class="goal-emoji">{{ goal.emoji }}</span>
+    <span class="goal-title {% if goal.completed %}done{% endif %}">{{ goal.title }}</span>
+    <button class="goal-check {% if goal.completed %}done{% endif %}"
+            onclick="toggleGoal(this, {{ goal.id }})">
+        {% if goal.completed %}✓{% endif %}
+    </button>
+</div>

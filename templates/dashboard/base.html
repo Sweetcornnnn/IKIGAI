@@ -1,0 +1,464 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}IKIGAI - Dashboard{% endblock %}</title>
+    <!-- Chart.js CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --gold: rgb(255 130 7 / 0.87);
+            --gold-light: rgba(201, 169, 110, 0.12);
+            --dark-bg: #0a0f18;
+            --panel-dark: #111827;
+            --panel-hover: #1a2438;
+            --text-white: #FFFFFF;
+            --text-muted: rgba(255,255,255,0.45);
+            --text-secondary: rgba(255,255,255,0.7);
+            --success-green: #6FAF8A;
+            --danger-red: #E07070;
+            --border-subtle: rgba(255,255,255,0.06);
+            --border-hover: rgba(255,255,255,0.12);
+            --shadow: 0 8px 32px rgba(0,0,0,0.4);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background-color: var(--dark-bg);
+            color: var(--text-white);
+            min-height: 100vh;
+        }
+
+        /* ─── Navbar ─── */
+        .navbar {
+            background: rgba(17, 24, 39, 0.92);
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid var(--border-subtle);
+            padding: 0 32px;
+            height: 64px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .navbar-brand {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            text-decoration: none;
+            font-weight: 700;
+            font-size: 18px;
+            color: var(--text-white);
+            letter-spacing: -0.5px;
+        }
+
+        .navbar-brand .brand-icon {
+            width: 32px;
+            height: 32px;
+            background: linear-gradient(135deg, var(--gold), #b8955a);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 15px;
+            font-weight: 800;
+            color: var(--dark-bg);
+        }
+
+        .navbar-brand span {
+            color: var(--gold);
+        }
+
+        .navbar-links {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .navbar-links .nav-link {
+            padding: 8px 16px;
+            border-radius: 8px;
+            color: var(--text-muted);
+            text-decoration: none;
+            font-size: 13px;
+            font-weight: 500;
+            transition: all 0.2s ease;
+        }
+
+        .navbar-links .nav-link:hover {
+            color: var(--text-white);
+            background: var(--gold-light);
+        }
+
+        .navbar-links .nav-link.active {
+            color: var(--gold);
+            background: var(--gold-light);
+        }
+
+        .navbar-divider {
+            width: 1px;
+            height: 28px;
+            background: var(--border-subtle);
+            margin: 0 6px;
+        }
+
+        /* Notification Bell */
+        .notification-wrap {
+            position: relative;
+            padding: 6px 10px;
+            border-radius: 8px;
+            transition: background 0.2s;
+            cursor: pointer;
+        }
+
+        .notification-wrap:hover {
+            background: var(--gold-light);
+        }
+
+        .notification-wrap .bell {
+            font-size: 18px;
+            color: var(--text-muted);
+            text-decoration: none;
+            display: block;
+            line-height: 1;
+        }
+
+        .notification-wrap .badge {
+            position: absolute;
+            top: 0;
+            right: 0;
+            background: var(--danger-red);
+            color: #fff;
+            font-size: 9px;
+            font-weight: 700;
+            padding: 1px 6px;
+            border-radius: 10px;
+            min-width: 18px;
+            text-align: center;
+            border: 2px solid var(--panel-dark);
+            display: none;
+        }
+
+        .notification-wrap .badge.show {
+            display: inline;
+        }
+
+        /* User Menu */
+        .user-menu {
+            position: relative;
+            margin-left: 4px;
+        }
+
+        .user-menu-btn {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 4px 4px 4px 12px;
+            border-radius: 8px;
+            background: transparent;
+            border: none;
+            color: var(--text-white);
+            cursor: pointer;
+            transition: background 0.2s;
+            font-family: 'Inter', sans-serif;
+        }
+
+        .user-menu-btn:hover {
+            background: var(--gold-light);
+        }
+
+        .user-menu-btn .avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #1a2438, #2a3a55);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--gold);
+            overflow: hidden;
+            flex-shrink: 0;
+        }
+
+        .user-menu-btn .avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .user-menu-btn .user-info {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 1px;
+            line-height: 1.2;
+        }
+
+        .user-menu-btn .user-info .name {
+            font-size: 13px;
+            font-weight: 600;
+        }
+
+        .user-menu-btn .user-info .role {
+            font-size: 10px;
+            color: var(--text-muted);
+            font-weight: 400;
+        }
+
+        .user-menu-btn .chevron {
+            color: var(--text-muted);
+            font-size: 11px;
+            margin-left: 2px;
+        }
+
+        /* Dropdown */
+        .dropdown-menu {
+            position: absolute;
+            top: calc(100% + 8px);
+            right: 0;
+            background: var(--panel-dark);
+            border: 1px solid var(--border-subtle);
+            border-radius: 12px;
+            padding: 6px;
+            min-width: 200px;
+            box-shadow: var(--shadow);
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(-6px);
+            transition: all 0.2s ease;
+            z-index: 200;
+        }
+
+        .dropdown-menu.open {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+
+        .dropdown-menu .dropdown-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 9px 14px;
+            border-radius: 8px;
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 13px;
+            font-weight: 500;
+            transition: all 0.15s ease;
+            border: none;
+            background: transparent;
+            cursor: pointer;
+            width: 100%;
+            font-family: 'Inter', sans-serif;
+        }
+
+        .dropdown-menu .dropdown-item:hover {
+            background: var(--gold-light);
+            color: var(--text-white);
+        }
+
+        .dropdown-menu .dropdown-item .icon {
+            font-size: 15px;
+            width: 20px;
+            text-align: center;
+        }
+
+        .dropdown-menu .dropdown-divider {
+            height: 1px;
+            background: var(--border-subtle);
+            margin: 4px 8px;
+        }
+
+        .dropdown-menu .dropdown-item.danger {
+            color: var(--danger-red);
+        }
+
+        .dropdown-menu .dropdown-item.danger:hover {
+            background: rgba(224, 112, 112, 0.1);
+        }
+
+        /* ─── Container ─── */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 32px;
+        }
+
+        /* ─── Messages ─── */
+        .messages {
+            margin-bottom: 20px;
+        }
+
+        .message {
+            padding: 12px 16px;
+            border-radius: 8px;
+            font-size: 14px;
+            margin-bottom: 8px;
+        }
+
+        .message.success {
+            background: rgba(111, 175, 138, 0.12);
+            color: var(--success-green);
+            border: 1px solid rgba(111, 175, 138, 0.2);
+        }
+
+        .message.error {
+            background: rgba(224, 112, 112, 0.12);
+            color: var(--danger-red);
+            border: 1px solid rgba(224, 112, 112, 0.2);
+        }
+
+        .message.info {
+            background: rgba(201, 169, 110, 0.12);
+            color: var(--gold);
+            border: 1px solid rgba(201, 169, 110, 0.2);
+        }
+
+        /* ─── Responsive ─── */
+        @media (max-width: 768px) {
+            .navbar {
+                padding: 0 16px;
+                height: 56px;
+            }
+
+            .navbar-links .nav-link {
+                padding: 6px 10px;
+                font-size: 12px;
+            }
+
+            .user-menu-btn .user-info {
+                display: none;
+            }
+
+            .user-menu-btn .chevron {
+                display: none;
+            }
+
+            .navbar-divider {
+                margin: 0 4px;
+            }
+
+            .container {
+                padding: 16px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <a href="{% url 'dashboard:home' %}" class="navbar-brand">
+            <div class="brand-icon">I</div>
+            <span>IKIGAI</span>
+        </a>
+
+        <div class="navbar-links">
+            <a href="{% url 'dashboard:home' %}" class="nav-link {% if request.resolver_match.url_name == 'home' %}active{% endif %}">Dashboard</a>
+            <a href="{% url 'tasks:weekly' %}" class="nav-link {% if 'tasks' in request.path %}active{% endif %}">Tasks</a>
+            <a href="{% url 'habits:list' %}" class="nav-link {% if 'habits' in request.path %}active{% endif %}">Habits</a>
+            <a href="{% url 'goals:dashboard' %}" class="nav-link {% if 'goals' in request.path %}active{% endif %}">Goals</a>
+
+            <div class="navbar-divider"></div>
+
+            <div class="notification-wrap">
+                <a href="{% url 'notifications:list' %}" class="bell">🔔</a>
+                <span class="badge {% if unread_count > 0 %}show{% endif %}" id="notification-count">{{ unread_count }}</span>
+            </div>
+
+            <div class="navbar-divider"></div>
+
+            <!-- User Dropdown -->
+            <div class="user-menu">
+                <button class="user-menu-btn" id="userMenuBtn" onclick="toggleDropdown()">
+                    <div class="avatar">
+                        {% if user.profile.get_avatar_url %}
+                        <img src="{{ user.profile.avatar.url }}" alt="{{ user.username }}">
+                        {% else %}
+                        {{ user.username|first|upper }}
+                        {% endif %}
+                    </div>
+                    <div class="user-info">
+                        <span class="name">{{ user.username }}</span>
+                        <span class="role">Level {{ user.profile.level }}</span>
+                    </div>
+                    <span class="chevron">▾</span>
+                </button>
+
+                <div class="dropdown-menu" id="userDropdown">
+                    <a href="{% url 'accounts:profile' %}" class="dropdown-item">
+                        <span class="icon">👤</span> Profile
+                    </a>
+                    <a href="{% url 'accounts:achievements' %}" class="dropdown-item">
+                        <span class="icon">🏆</span> Achievements
+                    </a>
+                    <div class="dropdown-divider"></div>
+                    <a href="{% url 'accounts:logout' %}" class="dropdown-item danger">
+                        <span class="icon">🚪</span> Sign Out
+                    </a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container">
+        {% if messages %}
+        <div class="messages">
+            {% for message in messages %}
+            <div class="message {{ message.tags }}">{{ message }}</div>
+            {% endfor %}
+        </div>
+        {% endif %}
+
+        {% block content %}
+        {% endblock %}
+    </div>
+
+    <script>
+        function toggleDropdown() {
+            const menu = document.getElementById('userDropdown');
+            menu.classList.toggle('open');
+        }
+
+        // Close dropdown when clicking outside
+        document.addEventListener('click', function(event) {
+            const dropdown = document.getElementById('userDropdown');
+            const btn = document.getElementById('userMenuBtn');
+            if (!btn.contains(event.target) && !dropdown.contains(event.target)) {
+                dropdown.classList.remove('open');
+            }
+        });
+
+        // Auto-refresh notification count every 30 seconds
+        function updateNotificationCount() {
+            fetch('/notifications/unread-count/')
+                .then(response => response.json())
+                .then(data => {
+                    const countEl = document.getElementById('notification-count');
+                    if (data.count > 0) {
+                        countEl.textContent = data.count;
+                        countEl.classList.add('show');
+                    } else {
+                        countEl.classList.remove('show');
+                    }
+                })
+                .catch(error => console.log('Error fetching notification count:', error));
+        }
+
+        setInterval(updateNotificationCount, 30000);
+        document.addEventListener('DOMContentLoaded', updateNotificationCount);
+    </script>
+</body>
+</html>

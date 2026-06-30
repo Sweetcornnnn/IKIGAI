@@ -1,0 +1,66 @@
+{% extends 'accounts/base.html' %}
+
+{% block title %}Register - IKIGAI{% endblock %}
+{% block subtitle %}Create your account{% endblock %}
+
+{% block content %}
+<form method="POST">
+    {% csrf_token %}
+    
+    <div class="form-group">
+        <label for="id_username">Username</label>
+        <input type="text" name="username" id="id_username" placeholder="Choose a username" value="{{ form.username.value|default:'' }}" required>
+        {% if form.username.errors %}
+        <ul class="form-errors">
+            {% for error in form.username.errors %}
+            <li>{{ error }}</li>
+            {% endfor %}
+        </ul>
+        {% endif %}
+        <div class="help-text">Required. 150 characters or fewer. Letters, digits and @/./+/-/_ only.</div>
+    </div>
+    
+    <div class="form-group">
+        <label for="id_email">Email</label>
+        <input type="email" name="email" id="id_email" placeholder="Enter your email" value="{{ form.email.value|default:'' }}" required>
+        {% if form.email.errors %}
+        <ul class="form-errors">
+            {% for error in form.email.errors %}
+            <li>{{ error }}</li>
+            {% endfor %}
+        </ul>
+        {% endif %}
+    </div>
+    
+    <div class="form-group">
+        <label for="id_password1">Password</label>
+        <input type="password" name="password1" id="id_password1" placeholder="Create a password" required>
+        {% if form.password1.errors %}
+        <ul class="form-errors">
+            {% for error in form.password1.errors %}
+            <li>{{ error }}</li>
+            {% endfor %}
+        </ul>
+        {% endif %}
+        <div class="help-text">At least 8 characters. Can't be entirely numeric.</div>
+    </div>
+    
+    <div class="form-group">
+        <label for="id_password2">Confirm Password</label>
+        <input type="password" name="password2" id="id_password2" placeholder="Confirm your password" required>
+        {% if form.password2.errors %}
+        <ul class="form-errors">
+            {% for error in form.password2.errors %}
+            <li>{{ error }}</li>
+            {% endfor %}
+        </ul>
+        {% endif %}
+    </div>
+    
+    <button type="submit" class="btn-primary">Create Account</button>
+</form>
+
+<div class="auth-links">
+    Already have an account? <a href="{% url 'accounts:login' %}">Sign in</a>
+</div>
+{% endblock %}

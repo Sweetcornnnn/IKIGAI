@@ -1,0 +1,182 @@
+{% extends 'dashboard/base.html' %}
+
+{% block title %}{{ title }} - IKIGAI{% endblock %}
+
+{% block content %}
+<div style="max-width: 600px; margin: 0 auto;">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
+        <h1 style="font-size: 24px; font-weight: 700; color: var(--text-white);">{{ title }}</h1>
+        <a href="{% url 'tasks:task_list' %}" style="padding: 8px 16px; background-color: rgba(255,255,255,0.04); border: 1px solid var(--border-subtle); border-radius: 8px; color: var(--text-muted); text-decoration: none; font-size: 14px; transition: background-color 0.2s;">← Back</a>
+    </div>
+
+    <div style="background-color: var(--panel-dark); border-radius: 12px; padding: 28px; border: 1px solid var(--border-subtle);">
+        <form method="POST">
+            {% csrf_token %}
+
+            <!-- Title -->
+            <div style="margin-bottom: 18px;">
+                <label for="id_title" style="display: block; font-size: 12px; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px;">
+                    Task Title <span style="color: var(--danger-red);">*</span>
+                </label>
+                {{ form.title }}
+                {% if form.title.errors %}
+                <ul style="color: var(--danger-red); font-size: 12px; margin-top: 4px; list-style: none; padding: 0;">
+                    {% for error in form.title.errors %}
+                    <li>{{ error }}</li>
+                    {% endfor %}
+                </ul>
+                {% endif %}
+            </div>
+
+            <!-- Description -->
+            <div style="margin-bottom: 18px;">
+                <label for="id_description" style="display: block; font-size: 12px; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px;">
+                    Description
+                </label>
+                {{ form.description }}
+                {% if form.description.errors %}
+                <ul style="color: var(--danger-red); font-size: 12px; margin-top: 4px; list-style: none; padding: 0;">
+                    {% for error in form.description.errors %}
+                    <li>{{ error }}</li>
+                    {% endfor %}
+                </ul>
+                {% endif %}
+            </div>
+
+            <!-- Category & Priority Row -->
+            <div style="display: flex; gap: 16px; margin-bottom: 18px;">
+                <div style="flex: 1;">
+                    <label for="id_category" style="display: block; font-size: 12px; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px;">
+                        Category
+                    </label>
+                    {{ form.category }}
+                    {% if form.category.errors %}
+                    <ul style="color: var(--danger-red); font-size: 12px; margin-top: 4px; list-style: none; padding: 0;">
+                        {% for error in form.category.errors %}
+                        <li>{{ error }}</li>
+                        {% endfor %}
+                    </ul>
+                    {% endif %}
+                </div>
+
+                <div style="flex: 1;">
+                    <label for="id_priority" style="display: block; font-size: 12px; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px;">
+                        Priority
+                    </label>
+                    {{ form.priority }}
+                    {% if form.priority.errors %}
+                    <ul style="color: var(--danger-red); font-size: 12px; margin-top: 4px; list-style: none; padding: 0;">
+                        {% for error in form.priority.errors %}
+                        <li>{{ error }}</li>
+                        {% endfor %}
+                    </ul>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Due Date -->
+            <div style="margin-bottom: 24px;">
+                <label for="id_due_date" style="display: block; font-size: 12px; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px;">
+                    Due Date
+                </label>
+                {{ form.due_date }}
+                {% if form.due_date.errors %}
+                <ul style="color: var(--danger-red); font-size: 12px; margin-top: 4px; list-style: none; padding: 0;">
+                    {% for error in form.due_date.errors %}
+                    <li>{{ error }}</li>
+                    {% endfor %}
+                </ul>
+                {% endif %}
+                <div style="color: rgba(255,255,255,0.3); font-size: 11px; margin-top: 4px;">Leave blank if no deadline.</div>
+            </div>
+
+            <!-- Buttons -->
+            <div style="display: flex; gap: 12px;">
+                <button type="submit" style="flex: 1; padding: 14px; background-color: var(--gold); color: var(--dark-bg); border: none; border-radius: 8px; font-size: 16px; font-weight: 700; cursor: pointer; transition: opacity 0.2s;">
+                    {% if task %}Update Task{% else %}Create Task{% endif %}
+                </button>
+                <a href="{% url 'tasks:task_list' %}" style="padding: 14px 24px; background-color: rgba(255,255,255,0.04); border: 1px solid var(--border-subtle); border-radius: 8px; color: var(--text-muted); text-decoration: none; font-size: 16px; font-weight: 600; text-align: center; transition: background-color 0.2s;">Cancel</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Additional styles for form elements -->
+<style>
+    /* Style all form inputs to match IKIGAI design */
+    #id_title,
+    #id_description,
+    #id_category,
+    #id_priority,
+    #id_due_date {
+        width: 100%;
+        padding: 12px 14px;
+        background-color: rgba(255, 255, 255, 0.04);
+        border: 1px solid var(--border-subtle);
+        border-radius: 8px;
+        color: var(--text-white);
+        font-size: 14px;
+        transition: border-color 0.2s;
+        outline: none;
+        box-sizing: border-box;
+        font-family: inherit;
+    }
+
+    #id_title:focus,
+    #id_description:focus,
+    #id_category:focus,
+    #id_priority:focus,
+    #id_due_date:focus {
+        border-color: var(--gold);
+    }
+
+    #id_title::placeholder,
+    #id_description::placeholder {
+        color: rgba(255, 255, 255, 0.25);
+    }
+
+    #id_description {
+        min-height: 80px;
+        resize: vertical;
+    }
+
+    #id_category,
+    #id_priority {
+        appearance: none;
+        cursor: pointer;
+    }
+
+    #id_category option,
+    #id_priority option {
+        background-color: var(--panel-dark);
+        color: var(--text-white);
+    }
+
+    /* Date picker styling */
+    #id_due_date::-webkit-calendar-picker-indicator {
+        filter: invert(1);
+        cursor: pointer;
+    }
+
+    #id_due_date[type="date"] {
+        color-scheme: dark;
+    }
+
+    /* Hover effects */
+    #id_title:hover,
+    #id_description:hover,
+    #id_category:hover,
+    #id_priority:hover,
+    #id_due_date:hover {
+        border-color: rgba(201, 169, 110, 0.3);
+    }
+
+    .btn-hover:hover {
+        opacity: 0.85;
+    }
+
+    .btn-secondary-hover:hover {
+        background-color: rgba(255, 255, 255, 0.08);
+    }
+</style>
+{% endblock %}

@@ -1,0 +1,339 @@
+{% extends 'accounts/base.html' %}
+
+{% block title %}Profile - IKIGAI{% endblock %}
+{% block subtitle %}{% endblock %}
+
+{% block content %}
+<div style="width: 100%; max-width: 1200px; margin: 0 auto; padding: 0 40px;">
+
+    <!-- Profile Header -->
+    <div style="display: flex; align-items: center; justify-content: space-between; padding: 24px 0; flex-wrap: wrap; gap: 16px;">
+
+        <div style="display: flex; align-items: center; gap: 24px; flex-wrap: wrap;">
+            <!-- Avatar -->
+            <div style="flex-shrink: 0;">
+                <div style="width: 80px; height: 80px; border-radius: 50%; background: linear-gradient(135deg, #1a2438, #2a3a55); display: flex; align-items: center; justify-content: center; overflow: hidden; border: 2px solid var(--gold);">
+                    {% if user.profile.get_avatar_url %}
+                    <img src="{{ user.profile.avatar.url }}" alt="{{ user.username }}" style="width: 100%; height: 100%; object-fit: cover;">
+                    {% else %}
+                    <span style="font-size: 32px; font-weight: 700; color: var(--gold);">{{ user.username|first|upper }}</span>
+                    {% endif %}
+                </div>
+            </div>
+
+            <div>
+                <h1 style="font-size: 24px; font-weight: 700; color: var(--text-white); letter-spacing: -0.5px; margin: 0;">{{ user.username }}</h1>
+                <p style="color: var(--text-muted); font-size: 13px; margin: 2px 0 0 0;">{{ user.email }}</p>
+                <div style="display: flex; gap: 16px; margin-top: 4px; flex-wrap: wrap;">
+                    <span style="font-size: 12px; color: var(--text-secondary);">🎯 Level {{ user.profile.level }}</span>
+                    <span style="font-size: 12px; color: var(--text-secondary);">⚡ {{ user.profile.xp }} XP</span>
+                    <span style="font-size: 12px; color: var(--text-secondary);">🔥 {{ user.profile.streak_days }} day streak</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Edit Button -->
+        <div style="flex-shrink: 0;">
+            <button onclick="openModal()" style="padding: 10px 28px; background: var(--gold); color: var(--dark-bg); border: none; border-radius: 8px; font-size: 14px; font-weight: 700; cursor: pointer; transition: all 0.2s; font-family: 'Inter', sans-serif; white-space: nowrap;">
+                ✎ Edit Profile
+            </button>
+        </div>
+    </div>
+
+    <!-- Stats Row -->
+    <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; padding: 16px 0;">
+        <div style="text-align: center;">
+            <div style="font-size: 28px; font-weight: 700; color: var(--gold);">{{ user.profile.xp }}</div>
+            <div style="font-size: 10px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; margin-top: 2px;">Total XP</div>
+        </div>
+        <div style="text-align: center;">
+            <div style="font-size: 28px; font-weight: 700; color: var(--gold);">{{ user.profile.level }}</div>
+            <div style="font-size: 10px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; margin-top: 2px;">Level</div>
+        </div>
+        <div style="text-align: center;">
+            <div style="font-size: 28px; font-weight: 700; color: var(--success-green);">{{ user.profile.streak_days }}</div>
+            <div style="font-size: 10px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; margin-top: 2px;">Day Streak</div>
+        </div>
+        <div style="text-align: center;">
+            <div style="font-size: 28px; font-weight: 700; color: var(--gold);">{{ unlocked_count }}</div>
+            <div style="font-size: 10px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; margin-top: 2px;">Achievements</div>
+        </div>
+    </div>
+
+    <!-- Streak Status -->
+    <div style="padding: 10px 0;">
+        <div style="text-align: center; font-size: 13px; color: var(--text-muted);">
+            {% if user.profile.last_activity_date == today %}
+                🔥 <strong style="color: var(--success-green);">Active streak!</strong> Complete a task today to keep it going.
+            {% elif user.profile.last_activity_date == yesterday %}
+                ⚠️ <strong style="color: var(--gold);">Don't lose your streak!</strong> Complete a task today.
+            {% elif user.profile.streak_days > 0 %}
+                💪 Streak broken at {{ user.profile.streak_days }} days. Start a new one!
+            {% else %}
+                🚀 Complete a task to start your streak!
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Achievements -->
+    <div style="padding: 14px 0;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+            <h3 style="font-size: 15px; font-weight: 700; color: var(--text-white); margin: 0;">🏆 Achievements</h3>
+            <a href="{% url 'accounts:achievements' %}" style="color: var(--gold); text-decoration: none; font-size: 12px; font-weight: 500;">View All →</a>
+        </div>
+
+        <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+            {% for item in achievements|slice:":8" %}
+                <div style="text-align: center; padding: 10px 14px; background: {% if item.unlocked %}rgba(201,169,110,0.06){% else %}rgba(255,255,255,0.02){% endif %}; border-radius: 8px; border: 1px solid {% if item.unlocked %}rgba(201,169,110,0.15){% else %}var(--border-subtle){% endif %}; min-width: 65px; opacity: {% if item.unlocked %}1{% else %}0.4{% endif %};">
+                    <div style="font-size: 24px;">{{ item.achievement.icon }}</div>
+                    <div style="font-size: 8px; color: var(--text-muted); margin-top: 3px; line-height: 1.2;">{{ item.achievement.name|truncatechars:10 }}</div>
+                    {% if item.unlocked %}
+                    <div style="font-size: 7px; color: var(--success-green); margin-top: 2px;">✓</div>
+                    {% endif %}
+                </div>
+            {% empty %}
+                <div style="color: var(--text-muted); font-size: 13px; padding: 8px 0;">
+                    Complete tasks to unlock achievements! 🚀
+                </div>
+            {% endfor %}
+        </div>
+
+        {% if unlocked_count > 0 %}
+        <div style="text-align: center; margin-top: 8px; font-size: 11px; color: var(--text-muted);">
+            {{ unlocked_count }} of {{ total_count }} achievements unlocked
+        </div>
+        {% endif %}
+    </div>
+
+    <!-- Footer -->
+    <div style="display: flex; justify-content: center; gap: 20px; padding: 16px 0; border-top: 1px solid var(--border-subtle); margin-top: 8px;">
+        <a href="{% url 'dashboard:home' %}" style="color: var(--text-muted); text-decoration: none; font-size: 12px;">← Back to Dashboard</a>
+        <span style="color: var(--border-subtle);">|</span>
+        <a href="{% url 'accounts:logout' %}" style="color: var(--danger-red); text-decoration: none; font-size: 12px;">Sign Out</a>
+    </div>
+</div>
+
+<!-- Edit Profile Modal -->
+<div id="editModal" style="display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.6); backdrop-filter: blur(6px); z-index: 1000; align-items: center; justify-content: center; animation: fadeIn 0.2s ease;">
+    <div style="background: var(--panel-dark); border-radius: 16px; padding: 36px 40px; max-width: 520px; width: 90%; border: 1px solid var(--border-subtle); box-shadow: 0 20px 60px rgba(0,0,0,0.5); max-height: 85vh; overflow-y: auto;">
+
+        <!-- Modal Header -->
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+            <h3 style="font-size: 18px; font-weight: 700; color: var(--text-white); margin: 0;">✎ Edit Profile</h3>
+            <button onclick="closeModal()" style="background: none; border: none; color: var(--text-muted); font-size: 22px; cursor: pointer; padding: 0 4px; transition: color 0.2s;">✕</button>
+        </div>
+
+        <form method="POST" enctype="multipart/form-data" id="profileForm">
+            {% csrf_token %}
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 14px;">
+                <div class="form-group">
+                    <label for="id_username">Username</label>
+                    {{ user_form.username }}
+                    {% if user_form.username.errors %}
+                    <ul class="form-errors">
+                        {% for error in user_form.username.errors %}
+                        <li>{{ error }}</li>
+                        {% endfor %}
+                    </ul>
+                    {% endif %}
+                </div>
+
+                <div class="form-group">
+                    <label for="id_email">Email</label>
+                    {{ user_form.email }}
+                    {% if user_form.email.errors %}
+                    <ul class="form-errors">
+                        {% for error in user_form.email.errors %}
+                        <li>{{ error }}</li>
+                        {% endfor %}
+                    </ul>
+                    {% endif %}
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="id_avatar">Profile Picture</label>
+                {{ profile_form.avatar }}
+                {% if profile_form.avatar.errors %}
+                <ul class="form-errors">
+                    {% for error in profile_form.avatar.errors %}
+                    <li>{{ error }}</li>
+                    {% endfor %}
+                </ul>
+                {% endif %}
+                <div class="help-text">Upload a square image.</div>
+            </div>
+
+            <div class="form-group">
+                <label for="id_bio">Bio</label>
+                {{ profile_form.bio }}
+                {% if profile_form.bio.errors %}
+                <ul class="form-errors">
+                    {% for error in profile_form.bio.errors %}
+                    <li>{{ error }}</li>
+                    {% endfor %}
+                </ul>
+                {% endif %}
+            </div>
+
+            <div style="display: flex; gap: 10px; margin-top: 6px;">
+                <button type="submit" style="flex: 1; padding: 11px; background: var(--gold); color: var(--dark-bg); border: none; border-radius: 8px; font-size: 15px; font-weight: 700; cursor: pointer; transition: opacity 0.2s; font-family: 'Inter', sans-serif;">Save Changes</button>
+                <button type="button" onclick="closeModal()" style="padding: 11px 22px; background: transparent; border: 1px solid var(--border-subtle); border-radius: 8px; color: var(--text-muted); font-size: 14px; font-weight: 600; cursor: pointer; transition: background 0.2s; font-family: 'Inter', sans-serif;">Cancel</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<style>
+    /* Remove all container padding from base */
+    .container {
+        max-width: 100% !important;
+        padding: 0 !important;
+        margin: 0 !important;
+    }
+
+    /* Form styling */
+    .form-group {
+        margin-bottom: 14px;
+    }
+
+    .form-group input,
+    .form-group textarea {
+        width: 100%;
+        padding: 9px 12px;
+        background: rgba(255,255,255,0.04);
+        border: 1px solid var(--border-subtle);
+        border-radius: 6px;
+        color: var(--text-white);
+        font-size: 14px;
+        transition: border-color 0.2s;
+        outline: none;
+        font-family: 'Inter', sans-serif;
+        box-sizing: border-box;
+    }
+
+    .form-group input:focus,
+    .form-group textarea:focus {
+        border-color: var(--gold);
+    }
+
+    .form-group textarea {
+        min-height: 50px;
+        resize: vertical;
+    }
+
+    .form-group label {
+        display: block;
+        font-size: 10px;
+        font-weight: 600;
+        color: var(--text-muted);
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        margin-bottom: 3px;
+    }
+
+    .form-group .help-text {
+        color: rgba(255,255,255,0.3);
+        font-size: 10px;
+        margin-top: 2px;
+    }
+
+    .form-errors {
+        color: var(--danger-red);
+        font-size: 11px;
+        margin-top: 3px;
+        list-style: none;
+        padding: 0;
+    }
+
+    .form-errors li {
+        margin-bottom: 1px;
+    }
+
+    input[type="file"] {
+        padding: 6px 10px;
+        background: rgba(255,255,255,0.03);
+        border: 1px solid var(--border-subtle);
+        border-radius: 6px;
+        color: var(--text-muted);
+        font-size: 12px;
+        width: 100%;
+        font-family: 'Inter', sans-serif;
+    }
+
+    input[type="file"]::-webkit-file-upload-button {
+        background: rgba(201,169,110,0.15);
+        color: var(--gold);
+        border: none;
+        padding: 4px 12px;
+        border-radius: 6px;
+        font-weight: 600;
+        font-size: 11px;
+        cursor: pointer;
+        font-family: 'Inter', sans-serif;
+        margin-right: 8px;
+    }
+
+    @keyframes fadeIn {
+        from { opacity: 0; transform: scale(0.96); }
+        to { opacity: 1; transform: scale(1); }
+    }
+
+    #editModal > div::-webkit-scrollbar {
+        width: 4px;
+    }
+    #editModal > div::-webkit-scrollbar-track {
+        background: transparent;
+    }
+    #editModal > div::-webkit-scrollbar-thumb {
+        background: var(--border-subtle);
+        border-radius: 4px;
+    }
+
+    @media (max-width: 768px) {
+        [style*="grid-template-columns: repeat(4, 1fr);"] {
+            grid-template-columns: repeat(2, 1fr) !important;
+            gap: 8px !important;
+        }
+        [style*="grid-template-columns: 1fr 1fr;"] {
+            grid-template-columns: 1fr !important;
+        }
+        [style*="display: flex; align-items: center; justify-content: space-between;"] {
+            flex-direction: column;
+            align-items: stretch !important;
+            text-align: center;
+        }
+        [style*="display: flex; align-items: center; gap: 24px;"] {
+            flex-direction: column;
+            text-align: center;
+        }
+        #editModal > div {
+            padding: 24px 18px !important;
+            max-width: 95% !important;
+        }
+    }
+</style>
+
+<script>
+    function openModal() {
+        document.getElementById('editModal').style.display = 'flex';
+        document.body.style.overflow = 'hidden';
+    }
+
+    function closeModal() {
+        document.getElementById('editModal').style.display = 'none';
+        document.body.style.overflow = '';
+    }
+
+    // Close on backdrop click
+    document.getElementById('editModal').addEventListener('click', function(e) {
+        if (e.target === this) closeModal();
+    });
+
+    // Close on Escape
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape') closeModal();
+    });
+</script>
+{% endblock %}

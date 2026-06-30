@@ -1,0 +1,669 @@
+{% extends 'dashboard/base.html' %}
+{% load static %}
+
+{% block title %}Habits - IKIGAI{% endblock %}
+
+{% block content %}
+<style>
+    /* Hide scrollbar */
+    ::-webkit-scrollbar {
+        display: none;
+    }
+    * {
+        scrollbar-width: none;
+    }
+    body {
+        -ms-overflow-style: none;
+    }
+
+    .habits-container {
+        max-width: 100%;
+        padding: 0 16px;
+    }
+
+    .habits-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 20px;
+        flex-wrap: wrap;
+        gap: 12px;
+    }
+
+    .habits-header h1 {
+        font-size: 24px;
+        font-weight: 700;
+        margin: 0;
+        color: var(--text-white);
+    }
+
+    .btn-primary {
+        padding: 8px 20px;
+        background: var(--gold);
+        color: var(--dark-bg);
+        border: none;
+        border-radius: 6px;
+        font-weight: 600;
+        font-size: 13px;
+        cursor: pointer;
+        text-decoration: none;
+        display: inline-block;
+        transition: all 0.2s;
+        font-family: 'Inter', sans-serif;
+    }
+
+    .btn-primary:hover {
+        opacity: 0.85;
+        transform: translateY(-1px);
+    }
+
+    .month-nav {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 8px 0;
+        margin-bottom: 12px;
+    }
+
+    .month-nav .month-title {
+        font-size: 18px;
+        font-weight: 700;
+        color: var(--text-white);
+    }
+
+    .month-nav .nav-btn {
+        padding: 6px 14px;
+        background: rgba(255,255,255,0.04);
+        border: 1px solid var(--border-subtle);
+        border-radius: 6px;
+        color: var(--text-muted);
+        text-decoration: none;
+        font-size: 13px;
+        transition: all 0.2s;
+    }
+
+    .month-nav .nav-btn:hover {
+        background: rgba(255,255,255,0.08);
+        color: var(--text-white);
+    }
+
+    .habit-grid {
+        background: var(--panel-dark);
+        border-radius: 10px;
+        border: 1px solid var(--border-subtle);
+        overflow: hidden;
+        margin-bottom: 20px;
+    }
+
+    .habit-grid .grid-header {
+        display: grid;
+        grid-template-columns: 140px repeat({{ days|length }}, 1fr);
+        background: rgba(255,255,255,0.02);
+        padding: 6px 8px;
+        border-bottom: 1px solid var(--border-subtle);
+    }
+
+    .habit-grid .grid-header .header-day {
+        text-align: center;
+        font-size: 11px;
+        font-weight: 600;
+        color: var(--text-muted);
+        padding: 2px 0;
+    }
+
+    .habit-grid .grid-header .header-day.habit-label {
+        text-align: left;
+        font-size: 10px;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    .habit-grid .habit-row {
+        display: grid;
+        grid-template-columns: 140px repeat({{ days|length }}, 1fr);
+        padding: 4px 8px;
+        border-bottom: 1px solid rgba(255,255,255,0.03);
+        align-items: center;
+        transition: background 0.15s;
+    }
+
+    .habit-grid .habit-row:last-child {
+        border-bottom: none;
+    }
+
+    .habit-grid .habit-row:hover {
+        background: rgba(255,255,255,0.02);
+    }
+
+    .habit-grid .habit-row .habit-name {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 12px;
+        font-weight: 500;
+        color: var(--text-white);
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+    .habit-grid .habit-row .habit-name .icon {
+        font-size: 15px;
+        flex-shrink: 0;
+    }
+
+    .habit-grid .habit-row .day-cell {
+        text-align: center;
+        padding: 2px 0;
+    }
+
+    /* Check button (today only) */
+    .check-btn {
+        width: 24px;
+        height: 24px;
+        border-radius: 50%;
+        border: 2px solid var(--border-subtle);
+        background: transparent;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 11px;
+        color: transparent;
+        line-height: 1;
+    }
+
+    .check-btn:hover:not(.future):not(:disabled) {
+        border-color: var(--gold);
+        background: rgba(201,169,110,0.1);
+        transform: scale(1.05);
+    }
+
+    .check-btn.done {
+        background: var(--success-green);
+        border-color: var(--success-green);
+        color: var(--dark-bg);
+    }
+
+    .check-btn.future {
+        opacity: 0.2;
+        cursor: not-allowed;
+    }
+
+    .check-btn:disabled {
+        cursor: not-allowed;
+        opacity: 0.3;
+    }
+
+    .check-btn.today {
+        border-color: var(--gold);
+        box-shadow: 0 0 12px rgba(201,169,110,0.15);
+    }
+
+    /* Static indicators for past/future */
+    .check-static {
+        display: inline-block;
+        width: 16px;
+        height: 16px;
+        border-radius: 50%;
+        border: 2px solid var(--border-subtle);
+        background: transparent;
+        opacity: 0.6;
+    }
+
+    .check-static.done {
+        background: var(--success-green);
+        border-color: var(--success-green);
+        opacity: 0.8;
+    }
+
+    .check-static.empty {
+        border-color: rgba(255,255,255,0.08);
+        background: transparent;
+    }
+
+    .check-static.future {
+        border-color: rgba(255,255,255,0.05);
+        background: transparent;
+        opacity: 0.2;
+    }
+
+    /* Stats Section */
+    .stats-section {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 16px;
+        margin-bottom: 20px;
+    }
+
+    .stats-card {
+        background: var(--panel-dark);
+        border-radius: 10px;
+        padding: 16px 20px;
+        border: 1px solid var(--border-subtle);
+    }
+
+    .stats-card h3 {
+        font-size: 11px;
+        font-weight: 700;
+        color: var(--text-muted);
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        margin-bottom: 8px;
+    }
+
+    .stats-card .stat-number {
+        font-size: 28px;
+        font-weight: 700;
+        color: var(--gold);
+    }
+
+    .stats-card .stat-label {
+        font-size: 12px;
+        color: var(--text-muted);
+        margin-top: 2px;
+    }
+
+    .stats-card .progress-bar {
+        background: rgba(255,255,255,0.04);
+        border-radius: 6px;
+        height: 6px;
+        overflow: hidden;
+        margin-top: 6px;
+    }
+
+    .stats-card .progress-bar .fill {
+        height: 100%;
+        background: linear-gradient(90deg, var(--gold), #d4b87a);
+        border-radius: 6px;
+        transition: width 0.5s ease;
+    }
+
+    /* Habit Summary Table */
+    .habit-summary {
+        background: var(--panel-dark);
+        border-radius: 10px;
+        padding: 16px 20px;
+        border: 1px solid var(--border-subtle);
+        margin-bottom: 20px;
+        overflow-x: auto;
+    }
+
+    .habit-summary h3 {
+        font-size: 11px;
+        font-weight: 700;
+        color: var(--text-muted);
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        margin-bottom: 12px;
+    }
+
+    .habit-summary table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 13px;
+    }
+
+    .habit-summary table th {
+        text-align: left;
+        font-size: 10px;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        color: var(--text-muted);
+        font-weight: 600;
+        padding: 6px 8px;
+        border-bottom: 1px solid var(--border-subtle);
+    }
+
+    .habit-summary table td {
+        padding: 6px 8px;
+        color: var(--text-secondary);
+        border-bottom: 1px solid rgba(255,255,255,0.03);
+    }
+
+    .habit-summary table tr:last-child td {
+        border-bottom: none;
+    }
+
+    .habit-summary table td .habit-cell {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+    }
+
+    .habit-summary table td .habit-cell .icon {
+        font-size: 14px;
+    }
+
+    .habit-summary table td .habit-cell .name {
+        font-weight: 500;
+        color: var(--text-white);
+    }
+
+    .habit-summary table td .success-rate {
+        font-weight: 600;
+    }
+
+    .habit-summary table td .success-rate.high {
+        color: var(--success-green);
+    }
+
+    .habit-summary table td .success-rate.medium {
+        color: var(--gold);
+    }
+
+    .habit-summary table td .success-rate.low {
+        color: var(--danger-red);
+    }
+
+    .habit-summary table td .streak {
+        color: var(--gold);
+        font-weight: 500;
+    }
+
+    .habit-summary table td .streak.best {
+        color: var(--success-green);
+    }
+
+    @media (max-width: 768px) {
+        .habit-grid .grid-header {
+            grid-template-columns: 100px repeat({{ days|length }}, 1fr);
+            padding: 4px 6px;
+        }
+        .habit-grid .habit-row {
+            grid-template-columns: 100px repeat({{ days|length }}, 1fr);
+            padding: 3px 6px;
+        }
+        .habit-grid .habit-row .habit-name {
+            font-size: 10px;
+            gap: 4px;
+        }
+        .habit-grid .habit-row .habit-name .icon {
+            font-size: 12px;
+        }
+        .check-btn,
+        .check-static {
+            width: 20px;
+            height: 20px;
+            font-size: 9px;
+        }
+        .check-static {
+            width: 14px;
+            height: 14px;
+        }
+        .stats-section {
+            grid-template-columns: 1fr;
+        }
+        .habits-header {
+            flex-direction: column;
+            align-items: stretch;
+        }
+        .habit-summary table {
+            font-size: 11px;
+        }
+        .habit-summary table th,
+        .habit-summary table td {
+            padding: 4px 6px;
+        }
+    }
+
+    @media (max-width: 480px) {
+        .habit-grid .grid-header {
+            grid-template-columns: 70px repeat({{ days|length }}, 1fr);
+            padding: 3px 4px;
+        }
+        .habit-grid .grid-header .header-day {
+            font-size: 9px;
+        }
+        .habit-grid .habit-row {
+            grid-template-columns: 70px repeat({{ days|length }}, 1fr);
+            padding: 2px 4px;
+        }
+        .habit-grid .habit-row .habit-name {
+            font-size: 9px;
+            gap: 3px;
+        }
+        .habit-grid .habit-row .habit-name .icon {
+            font-size: 10px;
+        }
+        .check-btn,
+        .check-static {
+            width: 16px;
+            height: 16px;
+            font-size: 7px;
+            border-width: 1.5px;
+        }
+        .check-static {
+            width: 12px;
+            height: 12px;
+        }
+        .habit-summary table {
+            font-size: 10px;
+        }
+        .habit-summary table th,
+        .habit-summary table td {
+            padding: 3px 4px;
+        }
+    }
+</style>
+
+<div class="habits-container">
+
+    <!-- Header -->
+    <div class="habits-header">
+        <h1>My Habits</h1>
+        <a href="{% url 'habits:add' %}" class="btn-primary">+ New Habit</a>
+    </div>
+
+    <!-- Month Navigation -->
+    <div class="month-nav">
+        <a href="?year={{ prev_year }}&month={{ prev_month }}" class="nav-btn">‹</a>
+        <span class="month-title">{{ month_name }} {{ year }}</span>
+        <a href="?year={{ next_year }}&month={{ next_month }}" class="nav-btn">›</a>
+    </div>
+
+    <!-- Habit Grid -->
+    <div class="habit-grid">
+        <div class="grid-header">
+            <div class="header-day habit-label">Habit</div>
+            {% for day in days %}
+            <div class="header-day">{{ day|date:"j" }}</div>
+            {% endfor %}
+        </div>
+
+        {% for habit_data in grid_data %}
+        <div class="habit-row">
+            <div class="habit-name">
+                <span class="icon">{{ habit_data.habit.icon }}</span>
+                {{ habit_data.habit.name }}
+            </div>
+            {% for day in habit_data.days %}
+            <div class="day-cell">
+                {% if day.date == today %}
+                    <!-- Today: editable button -->
+                    <button class="check-btn
+                        {% if day.completed %}done{% endif %}
+                        today"
+                        data-habit-id="{{ habit_data.habit.id }}"
+                        data-date="{{ day.date|date:'Y-m-d' }}"
+                        onclick="toggleHabit(this)">
+                        {% if day.completed %}✓{% endif %}
+                    </button>
+                {% elif day.date < today %}
+                    <!-- Past: static indicator (read-only) -->
+                    <span class="check-static {% if day.completed %}done{% else %}empty{% endif %}"></span>
+                {% else %}
+                    <!-- Future: static placeholder -->
+                    <span class="check-static future"></span>
+                {% endif %}
+            </div>
+            {% endfor %}
+        </div>
+        {% empty %}
+        <div style="padding: 40px; text-align: center; color: var(--text-muted);">
+            <p style="font-size: 40px; margin-bottom: 10px;">🌱</p>
+            <p>No habits created yet.</p>
+            <a href="{% url 'habits:add' %}" class="btn-primary" style="margin-top: 10px; display: inline-block;">Create Your First Habit</a>
+        </div>
+        {% endfor %}
+    </div>
+
+    <!-- Stats Section -->
+    <div class="stats-section">
+        <div class="stats-card">
+            <h3>Monthly Progress</h3>
+            <div class="stat-number">{{ overall_percentage }}%</div>
+            <div class="stat-label">{{ total_completed }} of {{ total_possible }} completed</div>
+            <div class="progress-bar">
+                <div class="fill" style="width: {{ overall_percentage }}%;"></div>
+            </div>
+        </div>
+        <div class="stats-card">
+            <h3>Today's Progress</h3>
+            <div class="stat-number" style="color: {% if today_all_done %}var(--success-green){% else %}var(--gold){% endif %};">
+                {% if today_all_done %}✅ All Done!{% else %}{{ total_habits }} habits to go{% endif %}
+            </div>
+            <div class="stat-label">
+                {% if today_all_done %}
+                You've completed all your habits today!
+                {% else %}
+                Keep going! Complete your habits for today.
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Habit Summary Table -->
+    <div class="habit-summary">
+        <h3>Habit Summary</h3>
+        <table>
+            <thead>
+                <tr>
+                    <th>Habit</th>
+                    <th>Completed</th>
+                    <th>Total</th>
+                    <th>Success Rate</th>
+                    <th>Current Streak</th>
+                    <th>Longest Streak</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for stat in habit_stats %}
+                <tr>
+                    <td>
+                        <div class="habit-cell">
+                            <span class="icon">{{ stat.habit.icon }}</span>
+                            <span class="name">{{ stat.habit.name }}</span>
+                        </div>
+                    </td>
+                    <td>{{ stat.completed }}</td>
+                    <td>{{ stat.total }}</td>
+                    <td>
+                        <span class="success-rate
+                            {% if stat.percentage >= 70 %}high
+                            {% elif stat.percentage >= 40 %}medium
+                            {% else %}low{% endif %}">
+                            {{ stat.percentage }}%
+                        </span>
+                    </td>
+                    <td>
+                        <span class="streak">
+                            {{ stat.streak }} day{% if stat.streak != 1 %}s{% endif %}
+                        </span>
+                    </td>
+                    <td>
+                        <span class="streak best">
+                            {{ stat.longest_streak }} day{% if stat.longest_streak != 1 %}s{% endif %}
+                        </span>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="6" style="text-align: center; color: var(--text-muted); padding: 20px;">
+                        No habits to display. Create your first habit!
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Footer -->
+    <div style="display: flex; justify-content: center; gap: 20px; padding: 12px 0; border-top: 1px solid var(--border-subtle); margin-top: 4px;">
+        <a href="{% url 'dashboard:home' %}" style="color: var(--text-muted); text-decoration: none; font-size: 12px;">← Back to Dashboard</a>
+        <span style="color: var(--border-subtle);">|</span>
+        <a href="{% url 'accounts:logout' %}" style="color: var(--danger-red); text-decoration: none; font-size: 12px;">Sign Out</a>
+    </div>
+
+</div>
+
+<script>
+    function toggleHabit(btn) {
+        const habitId = btn.dataset.habitId;
+        const date = btn.dataset.date;
+
+        // Only allow toggling today (the button is only shown for today, but double-check)
+        const today = new Date().toISOString().split('T')[0];
+        if (date !== today) {
+            alert('You can only check habits for today.');
+            return;
+        }
+
+        const wasDone = btn.classList.contains('done');
+        if (wasDone) {
+            btn.classList.remove('done');
+            btn.textContent = '';
+        } else {
+            btn.classList.add('done');
+            btn.textContent = '✓';
+        }
+
+        const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]')?.value ||
+                         document.querySelector('input[name="csrfmiddlewaretoken"]')?.value;
+
+        fetch('{% url "habits:toggle" %}', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+                'X-CSRFToken': csrftoken || '{{ csrf_token }}'
+            },
+            body: `habit_id=${habitId}&date=${date}`
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                if (data.completed) {
+                    btn.classList.add('done');
+                    btn.textContent = '✓';
+                } else {
+                    btn.classList.remove('done');
+                    btn.textContent = '';
+                }
+                // Refresh to update stats
+                setTimeout(() => location.reload(), 500);
+            } else {
+                if (wasDone) {
+                    btn.classList.add('done');
+                    btn.textContent = '✓';
+                } else {
+                    btn.classList.remove('done');
+                    btn.textContent = '';
+                }
+                alert('Error: ' + data.error);
+            }
+        })
+        .catch(error => {
+            if (wasDone) {
+                btn.classList.add('done');
+                btn.textContent = '✓';
+            } else {
+                btn.classList.remove('done');
+                btn.textContent = '';
+            }
+            console.error('Error:', error);
+            alert('Failed to update habit. Please try again.');
+        });
+    }
+</script>
+{% endblock %}

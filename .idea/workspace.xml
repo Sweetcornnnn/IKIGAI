@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ChangeListManager">
+    <list default="true" id="76db4c93-058d-48aa-8f5b-ed13a09c349a" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/.idea/IKIGAI.iml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/inspectionProfiles/profiles_settings.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/modules.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/apps/accounts/forms.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/apps/accounts/urls.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/apps/dashboard/templatetags/dashboard_filters.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/apps/dashboard/urls.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/apps/gamification/management/commands/load_achievements.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/apps/gamification/urls.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/apps/gamification/utils.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/apps/goals/forms.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/apps/goals/urls.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/apps/habits/forms.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/apps/habits/urls.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/apps/notifications/urls.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/apps/notifications/utils.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/apps/tasks/forms.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/apps/tasks/urls.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/templates/accounts/achievements.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/templates/accounts/base.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/templates/accounts/login.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/templates/accounts/profile.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/templates/accounts/register.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/templates/dashboard/base.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/templates/dashboard/home.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/templates/goals/_goal_card.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/templates/goals/dashboard.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/templates/habits/add.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/templates/habits/delete.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/templates/habits/edit.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/templates/habits/list.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/templates/notifications/list.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/templates/tasks/task_confirm_delete.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/templates/tasks/task_form.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/templates/tasks/task_list.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/templates/tasks/weekly.html" afterDir="false" />
+    </list>
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="EmbeddingIndexingInfo">
+    <option name="cachedIndexableFilesCount" value="110" />
+  </component>
+  <component name="FileTemplateManagerImpl">
+    <option name="RECENT_TEMPLATES">
+      <list>
+        <option value="Python Script" />
+        <option value="HTML File" />
+      </list>
+    </option>
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="McpProjectServerCommands">
+    <commands />
+    <urls />
+  </component>
+  <component name="ProjectColorInfo">{
+  &quot;associatedIndex&quot;: 4,
+  &quot;fromUser&quot;: false
+}</component>
+  <component name="ProjectId" id="3FbZ4mmyHBPvVtnzxLVRnC5zo5l" />
+  <component name="ProjectLevelVcsManager">
+    <ConfirmationsSetting value="2" id="Add" />
+  </component>
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "DefaultHtmlFileTemplate": "HTML File",
+    "Git.Working.Tree.Tab.closed.by.user": "closed",
+    "ModuleVcsDetector.initialDetectionPerformed": "true",
+    "RunOnceActivity.MCP Project settings loaded": "true",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252": "true",
+    "RunOnceActivity.git.unshallow": "true",
+    "RunOnceActivity.typescript.service.memoryLimit.init": "true",
+    "codeWithMe.voiceChat.enabledByDefault": "false",
+    "git-widget-placeholder": "master",
+    "nodejs_package_manager_path": "npm"
+  }
+}]]></component>
+  <component name="RecentsManager">
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="C:\Users\zolin\PycharmProjects\IKIGAI\templates\accounts" />
+    </key>
+  </component>
+  <component name="SharedIndexes">
+    <attachedChunks>
+      <set>
+        <option value="bundled-python-sdk-c59985aa861c-c2ffad84badb-com.jetbrains.pycharm.pro.sharedIndexes.bundled-PY-261.24374.152" />
+      </set>
+    </attachedChunks>
+  </component>
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="76db4c93-058d-48aa-8f5b-ed13a09c349a" name="Changes" comment="" />
+      <created>1782345541248</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1782345541248</updated>
+    </task>
+    <servers />
+  </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="3" />
+  </component>
+  <component name="Vcs.Log.Tabs.Properties">
+    <option name="TAB_STATES">
+      <map>
+        <entry key="MAIN">
+          <value>
+            <State />
+          </value>
+        </entry>
+      </map>
+    </option>
+  </component>
+</project>

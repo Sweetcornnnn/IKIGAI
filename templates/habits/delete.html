@@ -1,0 +1,25 @@
+{% extends 'dashboard/base.html' %}
+
+{% block title %}Delete Habit - IKIGAI{% endblock %}
+
+{% block content %}
+<div style="max-width: 500px; margin: 40px auto; text-align: center;">
+    <div style="font-size: 48px; margin-bottom: 16px;">⚠️</div>
+    <h1 style="font-size: 24px; font-weight: 700; margin-bottom: 8px;">Delete Habit</h1>
+    <p style="color: var(--text-muted); margin-bottom: 24px;">
+        Are you sure you want to delete "<strong style="color: var(--text-white);">{{ habit.icon }} {{ habit.name }}</strong>"?
+        <br>
+        <span style="font-size: 13px; color: var(--text-muted);">This action cannot be undone.</span>
+    </p>
+    
+    <form method="POST">
+        {% csrf_token %}
+        <div style="display: flex; gap: 12px; justify-content: center;">
+            <a href="{% url 'habits:list' %}" class="btn-secondary" style="padding: 12px 24px; text-decoration: none;">Cancel</a>
+            <button type="submit" style="padding: 12px 24px; background: var(--danger-red); color: var(--dark-bg); border: none; border-radius: 8px; font-weight: 700; cursor: pointer; transition: opacity 0.2s; font-family: 'Inter', sans-serif;">
+                Confirm Delete
+            </button>
+        </div>
+    </form>
+</div>
+{% endblock %}
