@@ -39,6 +39,7 @@ def dashboard(request):
     total_goals = all_goals.count()
     completed_goals = all_goals.filter(completed=True).count()
     overall_percentage = int((completed_goals / total_goals) * 100) if total_goals > 0 else 0
+    goal_completion_rate = overall_percentage  # same as overall
 
     # ─── Monthly Habit Progress (for doughnut chart) ───
     first_day = today.replace(day=1)
@@ -95,6 +96,7 @@ def dashboard(request):
         'overall_percentage': overall_percentage,
         'completed_goals': completed_goals,
         'total_goals': total_goals,
+        'goal_completion_rate': goal_completion_rate,  # fixed
         'monthly_habit_percentage': monthly_habit_percentage,
         'total_completed_habits': total_completed_habits,
         'total_possible': total_possible,
@@ -163,12 +165,44 @@ def goal_add(request):
                     'title': goal.title,
                     'category': goal.category,
                     'completed': goal.completed,
+                    'description': goal.description,
                 }
             })
         else:
             return JsonResponse({'success': False, 'errors': form.errors}, status=400)
 
     return JsonResponse({'success': False}, status=405)
+
+
+@login_required
+def goal_detail(request, pk):
+    """
+    Get goal details for the modal (AJAX)
+    """
+    goal = get_object_or_404(Goal, pk=pk, user=request.user)
+    return JsonResponse({
+        'id': goal.id,
+        'emoji': goal.emoji,
+        'title': goal.title,
+        'description': goal.description or '',
+        'category': goal.category,
+        'completed': goal.completed,
+    })
+
+
+@login_required
+def goal_update(request, pk):
+    """
+    Update goal description (AJAX)
+    """
+    goal = get_object_or_404(Goal, pk=pk, user=request.user)
+    if request.method != 'POST':
+        return JsonResponse({'error': 'Invalid method'}, status=405)
+
+    description = request.POST.get('description', '')
+    goal.description = description
+    goal.save()
+    return JsonResponse({'success': True, 'description': description})
 
 
 @login_required

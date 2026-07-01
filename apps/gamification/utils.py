@@ -1,6 +1,9 @@
 from django.utils import timezone
 from apps.notifications.utils import create_notification
 from .models import Achievement, UserAchievement
+from apps.habits.models import Habit, HabitLog
+from apps.tasks.models import Task
+from apps.goals.models import Goal
 
 
 def update_streak(user):
@@ -11,24 +14,18 @@ def update_streak(user):
     profile = user.profile
     today = timezone.now().date()
 
-    # If user already has activity today, don't update streak again
     if profile.last_activity_date == today:
         return False
 
-    # Check if this is a consecutive day
     if profile.last_activity_date == today - timezone.timedelta(days=1):
-        # Consecutive day - increment streak
         profile.streak_days += 1
     else:
-        # Either first activity or streak broken - reset to 1
         profile.streak_days = 1
 
-    # Update last activity date
     profile.last_activity_date = today
     profile.save()
 
-    # Check for streak milestones
-    milestones = [3, 7, 14, 30, 60, 100]
+    milestones = [3, 7, 14, 21, 30, 60, 100]
     if profile.streak_days in milestones:
         create_notification(
             user=user,
@@ -39,16 +36,11 @@ def update_streak(user):
         )
         return True
 
-    # Check for streak achievements
     check_achievements(user)
-
     return False
 
 
 def get_streak_status(user):
-    """
-    Get streak status for display
-    """
     profile = user.profile
     today = timezone.now().date()
 
@@ -78,45 +70,36 @@ def check_achievements(user):
     Returns list of newly unlocked achievements
     """
     unlocked = []
-
-    # Get all achievements
     all_achievements = Achievement.objects.all()
-
-    # Get already unlocked achievement IDs for this user
     unlocked_ids = UserAchievement.objects.filter(user=user).values_list('achievement_id', flat=True)
 
     for achievement in all_achievements:
         if achievement.id in unlocked_ids:
-            continue  # Already unlocked
+            continue
 
         is_unlocked, progress = achievement.check_unlock(user)
 
         if is_unlocked:
-            # Unlock the achievement
             UserAchievement.objects.create(
                 user=user,
                 achievement=achievement
             )
 
-            # Add XP reward
             profile = user.profile
             profile.xp += achievement.xp_reward
 
-            # Check if this unlocks a new level
             new_level = (profile.xp // 100) + 1
             if new_level > profile.level:
                 profile.level = new_level
-                # Level up notification will be handled elsewhere
 
             profile.save()
 
-            # Create notification
             create_notification(
                 user=user,
                 notification_type='ACHIEVEMENT',
                 title=f'🏆 Achievement Unlocked: {achievement.name}',
                 message=f'You earned {achievement.xp_reward} XP for {achievement.description}',
-                link='/accounts/profile/'
+                link='/accounts/achievements/'
             )
 
             unlocked.append(achievement)
@@ -129,42 +112,60 @@ def get_user_achievements(user):
     Get all achievements with unlock status for a user
     """
     unlocked_ids = UserAchievement.objects.filter(user=user).values_list('achievement_id', flat=True)
+    profile = user.profile
 
     achievements = []
     for achievement in Achievement.objects.all():
         is_unlocked = achievement.id in unlocked_ids
-        is_unlocked, progress = achievement.check_unlock(user) if not is_unlocked else (True,
-                                                                                        achievement.requirement_value)
+        progress = 0
+        required = achievement.requirement_value
 
-        # Get progress for locked achievements
-        if not is_unlocked:
-            # Get progress based on requirement type
-            profile = user.profile
-            if achievement.requirement_type == 'TASKS_COMPLETED':
+        if is_unlocked:
+            progress = required
+        else:
+            req_type = achievement.requirement_type
+            if req_type == 'TASKS_COMPLETED':
                 progress = user.tasks.filter(status='COMPLETED').count()
-            elif achievement.requirement_type == 'STREAK_DAYS':
+            elif req_type == 'STREAK_DAYS':
                 progress = profile.streak_days
-            elif achievement.requirement_type == 'LEVEL_REACHED':
+            elif req_type == 'LEVEL_REACHED':
                 progress = profile.level
-            elif achievement.requirement_type == 'XP_EARNED':
+            elif req_type == 'XP_EARNED':
                 progress = profile.xp
-            else:
-                progress = 0
+            elif req_type == 'HABITS_CREATED':
+                progress = Habit.objects.filter(user=user, active=True).count()
+            elif req_type == 'HABITS_COMPLETED':
+                progress = HabitLog.objects.filter(user=user, completed=True).count()
+            elif req_type == 'COMBO_ACHIEVEMENT':
+                # Special case: return 1 if unlocked, else 0
+                is_unlocked, progress = achievement.check_unlock(user)
+                if is_unlocked:
+                    progress = required
+                else:
+                    progress = 0
+            elif req_type == 'PERFECT_DAY':
+                is_unlocked, progress = achievement.check_unlock(user)
+                if is_unlocked:
+                    progress = required
+                else:
+                    progress = 0
+            elif req_type == 'MORNING_PERSON':
+                is_unlocked, progress = achievement.check_unlock(user)
+                if is_unlocked:
+                    progress = required
+                else:
+                    progress = 0
 
         achievements.append({
             'achievement': achievement,
             'unlocked': is_unlocked,
-            'progress': min(progress, achievement.requirement_value),
-            'required': achievement.requirement_value,
-            'percentage': min(100, int((
-                                                   progress / achievement.requirement_value) * 100)) if achievement.requirement_value > 0 else 0,
+            'progress': min(progress, required),
+            'required': required,
+            'percentage': min(100, int((progress / required) * 100)) if required > 0 else 0,
         })
 
     return achievements
 
 
 def get_unlocked_count(user):
-    """
-    Get count of unlocked achievements for a user
-    """
     return UserAchievement.objects.filter(user=user).count()

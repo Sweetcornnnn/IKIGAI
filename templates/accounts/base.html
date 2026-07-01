@@ -5,9 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}IKIGAI{% endblock %}</title>
     <style>
-        /* Design tokens from your ProfileCard.tsx */
         :root {
-            --gold: rgb(255 105 0 / 0.87);
+            --gold: #C9A96E;
             --dark-bg: #0E1520;
             --panel-dark: #111927;
             --text-white: #FFFFFF;
@@ -61,6 +60,12 @@
 
         .card-header h1 span {
             color: var(--gold);
+            cursor: pointer;
+            transition: color 0.2s;
+        }
+
+        .card-header h1 span:hover {
+            color: #d4b87a;
         }
 
         .card-header p {
@@ -269,7 +274,7 @@
     <div class="container">
         <div class="card">
             <div class="card-header">
-                <h1>IKIGAI</h1>
+                <h1><span>IKIGAI</span></h1>
                 <p>{% block subtitle %}Find your purpose{% endblock %}</p>
             </div>
 

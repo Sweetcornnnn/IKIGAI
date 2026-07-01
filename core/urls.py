@@ -11,6 +11,7 @@ urlpatterns = [
     path('notifications/', include('apps.notifications.urls')),
     path('habits/', include('apps.habits.urls')),
     path('goals/', include('apps.goals.urls')),
+    path('admin-dashboard/', include('apps.admin_dashboard.urls')),
 ]
 
 if settings.DEBUG:

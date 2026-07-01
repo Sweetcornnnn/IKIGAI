@@ -1,0 +1,42 @@
+{% extends 'admin_dashboard/base.html' %}
+
+{% block title %}System - Admin{% endblock %}
+
+{% block content %}
+<div class="admin-header">
+    <h1>⚙️ System Settings</h1>
+    <p>System information and configuration.</p>
+</div>
+
+<div class="admin-grid">
+    <div class="admin-panel">
+        <div class="panel-title">📋 System Info</div>
+        <div style="padding: 4px 0;">
+            <div style="display: flex; justify-content: space-between; padding: 6px 0; border-bottom: 1px solid rgba(255,255,255,0.03);">
+                <span style="color: var(--text-muted);">Django Version</span>
+                <span style="font-weight: 500; color: var(--text-secondary);">{{ django_version }}</span>
+            </div>
+            <div style="display: flex; justify-content: space-between; padding: 6px 0; border-bottom: 1px solid rgba(255,255,255,0.03);">
+                <span style="color: var(--text-muted);">Database</span>
+                <span style="font-weight: 500; color: var(--text-secondary);">SQLite</span>
+            </div>
+            <div style="display: flex; justify-content: space-between; padding: 6px 0;">
+                <span style="color: var(--text-muted);">Server Time</span>
+                <span style="font-weight: 500; color: var(--text-secondary);">{{ now|date:"Y-m-d H:i:s" }}</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="admin-panel">
+        <div class="panel-title">🔗 Quick Links</div>
+        <div style="display: flex; flex-direction: column; gap: 8px; padding: 4px 0;">
+            <a href="{% url 'admin:index' %}" style="color: var(--admin-gold); text-decoration: none; padding: 8px 12px; background: rgba(255,255,255,0.02); border-radius: 4px; border: 1px solid var(--border-subtle);">
+                🔐 Django Admin Panel
+            </a>
+            <a href="{% url 'dashboard:home' %}" style="color: var(--text-muted); text-decoration: none; padding: 8px 12px; background: rgba(255,255,255,0.02); border-radius: 4px; border: 1px solid var(--border-subtle);">
+                📱 View Main Site
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %}

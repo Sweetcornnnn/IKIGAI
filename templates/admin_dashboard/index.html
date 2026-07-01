@@ -1,0 +1,107 @@
+{% extends 'admin_dashboard/base.html' %}
+
+{% block title %}Dashboard - Admin{% endblock %}
+
+{% block content %}
+<div class="admin-header">
+    <h1>Admin Dashboard</h1>
+    <p>Welcome back, <strong>{{ user.username }}</strong> — here's what's happening across the platform.</p>
+</div>
+
+<div class="stats-grid-admin">
+    <div class="stat-card-admin">
+        <div class="number">{{ total_users }}</div>
+        <div class="label">Total Users</div>
+    </div>
+    <div class="stat-card-admin">
+        <div class="number green">{{ new_users_week }}</div>
+        <div class="label">New Users (7 days)</div>
+    </div>
+    <div class="stat-card-admin">
+        <div class="number blue">{{ total_tasks }}</div>
+        <div class="label">Total Tasks</div>
+    </div>
+    <div class="stat-card-admin">
+        <div class="number green">{{ completed_tasks }}</div>
+        <div class="label">Tasks Completed</div>
+    </div>
+    <div class="stat-card-admin">
+        <div class="number red">{{ overdue_tasks }}</div>
+        <div class="label">Overdue Tasks</div>
+    </div>
+    <div class="stat-card-admin">
+        <div class="number">{{ total_achievements }}</div>
+        <div class="label">Achievements</div>
+    </div>
+</div>
+
+<div class="admin-grid">
+    <!-- Recent Activity -->
+    <div class="admin-panel">
+        <div class="panel-title">
+            ⚡ Recent Activity
+            <span style="font-size: 11px; color: var(--text-muted); font-weight: 400;">Last 10 events</span>
+        </div>
+        {% if recent_activities %}
+            {% for activity in recent_activities %}
+            <div class="activity-item">
+                <span class="icon">{{ activity.icon }}</span>
+                <div class="content">
+                    <div class="title">{{ activity.title }}</div>
+                    <div class="time">{{ activity.time|timesince }} ago</div>
+                </div>
+            </div>
+            {% endfor %}
+        {% else %}
+            <div style="text-align: center; padding: 20px; color: var(--text-muted);">
+                No recent activity.
+            </div>
+        {% endif %}
+    </div>
+
+    <!-- System Stats -->
+    <div class="admin-panel">
+        <div class="panel-title">
+            📊 System Stats
+        </div>
+        <div style="padding: 4px 0;">
+            <div style="display: flex; justify-content: space-between; padding: 6px 0; border-bottom: 1px solid rgba(255,255,255,0.03);">
+                <span style="color: var(--text-muted);">Total Habits</span>
+                <span style="font-weight: 600; color: var(--text-white);">{{ total_habits }}</span>
+            </div>
+            <div style="display: flex; justify-content: space-between; padding: 6px 0; border-bottom: 1px solid rgba(255,255,255,0.03);">
+                <span style="color: var(--text-muted);">Today's Habit Completions</span>
+                <span style="font-weight: 600; color: var(--admin-green);">{{ habit_logs }}</span>
+            </div>
+            <div style="display: flex; justify-content: space-between; padding: 6px 0; border-bottom: 1px solid rgba(255,255,255,0.03);">
+                <span style="color: var(--text-muted);">Achievements Unlocked</span>
+                <span style="font-weight: 600; color: var(--admin-gold);">{{ unlocked_achievements }}</span>
+            </div>
+            <div style="display: flex; justify-content: space-between; padding: 6px 0; border-bottom: 1px solid rgba(255,255,255,0.03);">
+                <span style="color: var(--text-muted);">Total Notifications</span>
+                <span style="font-weight: 600; color: var(--text-white);">{{ total_notifications }}</span>
+            </div>
+            <div style="display: flex; justify-content: space-between; padding: 6px 0;">
+                <span style="color: var(--text-muted);">Unread Notifications</span>
+                <span style="font-weight: 600; color: var(--admin-red);">{{ unread_notifications }}</span>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Quick Stats Row -->
+<div class="stats-grid-admin" style="grid-template-columns: repeat(3, 1fr);">
+    <div class="stat-card-admin">
+        <div class="number" style="font-size: 20px; color: var(--text-white);">{{ staff_users }}</div>
+        <div class="label">Staff Users</div>
+    </div>
+    <div class="stat-card-admin">
+        <div class="number" style="font-size: 20px; color: var(--admin-gold);">{{ pending_tasks }}</div>
+        <div class="label">Pending Tasks</div>
+    </div>
+    <div class="stat-card-admin">
+        <div class="number" style="font-size: 20px; color: var(--admin-blue);">{{ unlocked_achievements }}</div>
+        <div class="label">Unlocked Achievements</div>
+    </div>
+</div>
+{% endblock %}

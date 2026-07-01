@@ -1,45 +1,36 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
+  <component name="AutoImportSettings">
+    <option name="autoReloadType" value="SELECTIVE" />
+  </component>
   <component name="ChangeListManager">
-    <list default="true" id="76db4c93-058d-48aa-8f5b-ed13a09c349a" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/.idea/IKIGAI.iml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/inspectionProfiles/profiles_settings.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/modules.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/apps/accounts/forms.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/apps/accounts/urls.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/apps/dashboard/templatetags/dashboard_filters.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/apps/dashboard/urls.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/apps/gamification/management/commands/load_achievements.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/apps/gamification/urls.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/apps/gamification/utils.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/apps/goals/forms.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/apps/goals/urls.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/apps/habits/forms.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/apps/habits/urls.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/apps/notifications/urls.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/apps/notifications/utils.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/apps/tasks/forms.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/apps/tasks/urls.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/templates/accounts/achievements.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/templates/accounts/base.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/templates/accounts/login.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/templates/accounts/profile.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/templates/accounts/register.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/templates/dashboard/base.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/templates/dashboard/home.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/templates/goals/_goal_card.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/templates/goals/dashboard.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/templates/habits/add.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/templates/habits/delete.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/templates/habits/edit.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/templates/habits/list.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/templates/notifications/list.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/templates/tasks/task_confirm_delete.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/templates/tasks/task_form.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/templates/tasks/task_list.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/templates/tasks/weekly.html" afterDir="false" />
+    <list default="true" id="76db4c93-058d-48aa-8f5b-ed13a09c349a" name="Changes" comment="first commit">
+      <change afterPath="$PROJECT_DIR$/apps/admin_dashboard/urls.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/apps/gamification/management/commands/check_achievements.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/templates/admin_dashboard/base.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/templates/admin_dashboard/index.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/templates/admin_dashboard/login.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/templates/admin_dashboard/system.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/templates/admin_dashboard/users.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/gamification/management/commands/load_achievements.py" beforeDir="false" afterPath="$PROJECT_DIR$/apps/gamification/management/commands/load_achievements.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/gamification/models.py" beforeDir="false" afterPath="$PROJECT_DIR$/apps/gamification/models.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/gamification/utils.py" beforeDir="false" afterPath="$PROJECT_DIR$/apps/gamification/utils.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/goals/urls.py" beforeDir="false" afterPath="$PROJECT_DIR$/apps/goals/urls.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/goals/views.py" beforeDir="false" afterPath="$PROJECT_DIR$/apps/goals/views.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/habits/views.py" beforeDir="false" afterPath="$PROJECT_DIR$/apps/habits/views.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/tasks/views.py" beforeDir="false" afterPath="$PROJECT_DIR$/apps/tasks/views.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/core/settings.py" beforeDir="false" afterPath="$PROJECT_DIR$/core/settings.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/core/urls.py" beforeDir="false" afterPath="$PROJECT_DIR$/core/urls.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/db.sqlite3" beforeDir="false" afterPath="$PROJECT_DIR$/db.sqlite3" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/templates/accounts/base.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/accounts/base.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/templates/accounts/login.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/accounts/login.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/templates/dashboard/base.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/dashboard/base.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/templates/dashboard/home.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/dashboard/home.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/templates/goals/_goal_card.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/goals/_goal_card.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/templates/goals/dashboard.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/goals/dashboard.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/templates/habits/list.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/habits/list.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/templates/tasks/weekly.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/tasks/weekly.html" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -52,17 +43,88 @@
   <component name="FileTemplateManagerImpl">
     <option name="RECENT_TEMPLATES">
       <list>
-        <option value="Python Script" />
         <option value="HTML File" />
+        <option value="Python Script" />
       </list>
     </option>
   </component>
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
+  <component name="GitHubPullRequestSearchHistory"><![CDATA[{
+  "lastFilter": {
+    "state": "OPEN",
+    "assignee": "Sweetcornnnn"
+  }
+}]]></component>
+  <component name="GithubPullRequestsUISettings"><![CDATA[{
+  "selectedUrlAndAccountId": {
+    "url": "https://github.com/Sweetcornnnn/IKIGAI.git",
+    "accountId": "592deb0f-0014-4b86-9677-79ec940a3feb"
+  }
+}]]></component>
   <component name="McpProjectServerCommands">
     <commands />
     <urls />
+  </component>
+  <component name="NextEditCompletionFeaturesState">
+    <decayedCancelled>
+      <entry key="MS100" value="1.0" />
+      <entry key="MS500" value="1.0" />
+      <entry key="S2" value="1.000000000000022" />
+      <entry key="S5" value="1.0000034456318616" />
+      <entry key="S10" value="1.0018562413263592" />
+      <entry key="S30" value="1.1228979991689672" />
+      <entry key="S60" value="1.3505681091740718" />
+      <entry key="M2" value="1.5920895406600517" />
+      <entry key="M5" value="1.818189433604584" />
+      <entry key="M10" value="2.021427617712164" />
+      <entry key="M15" value="2.240629898274067" />
+      <entry key="M30" value="2.7506782490809396" />
+      <entry key="H1" value="3.235690013100209" />
+      <entry key="H2" value="3.574343340615849" />
+      <entry key="H4" value="3.7749903883281606" />
+      <entry key="D1" value="3.960682838113756" />
+      <entry key="W1" value="3.9943370918062064" />
+    </decayedCancelled>
+    <decayedSelected>
+      <entry key="MS100" value="0.0" />
+      <entry key="MS500" value="0.0" />
+      <entry key="S2" value="0.0" />
+      <entry key="S5" value="0.0" />
+      <entry key="S10" value="0.0" />
+      <entry key="S30" value="0.0" />
+      <entry key="S60" value="0.0" />
+      <entry key="M2" value="0.0" />
+      <entry key="M5" value="0.0" />
+      <entry key="M10" value="0.0" />
+      <entry key="M15" value="0.0" />
+      <entry key="M30" value="0.0" />
+      <entry key="H1" value="0.0" />
+      <entry key="H2" value="0.0" />
+      <entry key="H4" value="0.0" />
+      <entry key="D1" value="0.0" />
+      <entry key="W1" value="0.0" />
+    </decayedSelected>
+    <decayedShown>
+      <entry key="MS100" value="0.6830201283771977" />
+      <entry key="MS500" value="0.9265880618903709" />
+      <entry key="S2" value="0.9811189749983398" />
+      <entry key="S5" value="0.992407763002148" />
+      <entry key="S10" value="0.9980356861180361" />
+      <entry key="S30" value="1.1212849311029633" />
+      <entry key="S60" value="1.3494432278995172" />
+      <entry key="M2" value="1.591358217477939" />
+      <entry key="M5" value="1.8178327021035798" />
+      <entry key="M10" value="2.0212134207803336" />
+      <entry key="M15" value="2.240458527680809" />
+      <entry key="M30" value="2.750558421890323" />
+      <entry key="H1" value="3.235613708221695" />
+      <entry key="H2" value="3.5742994478338446" />
+      <entry key="H4" value="3.7749667392958073" />
+      <entry key="D1" value="3.96067863380875" />
+      <entry key="W1" value="3.994336484384837" />
+    </decayedShown>
   </component>
   <component name="ProjectColorInfo">{
   &quot;associatedIndex&quot;: 4,
@@ -88,6 +150,10 @@
     "RunOnceActivity.typescript.service.memoryLimit.init": "true",
     "codeWithMe.voiceChat.enabledByDefault": "false",
     "git-widget-placeholder": "master",
+    "node.js.detected.package.eslint": "true",
+    "node.js.detected.package.tslint": "true",
+    "node.js.selected.package.eslint": "(autodetect)",
+    "node.js.selected.package.tslint": "(autodetect)",
     "nodejs_package_manager_path": "npm"
   }
 }]]></component>
@@ -111,6 +177,23 @@
       <option name="presentableId" value="Default" />
       <updated>1782345541248</updated>
     </task>
+    <task id="LOCAL-00001" summary="first commit">
+      <option name="closed" value="true" />
+      <created>1782815430344</created>
+      <option name="number" value="00001" />
+      <option name="presentableId" value="LOCAL-00001" />
+      <option name="project" value="LOCAL" />
+      <updated>1782815430344</updated>
+    </task>
+    <task id="LOCAL-00002" summary="first commit">
+      <option name="closed" value="true" />
+      <created>1782815604910</created>
+      <option name="number" value="00002" />
+      <option name="presentableId" value="LOCAL-00002" />
+      <option name="project" value="LOCAL" />
+      <updated>1782815604910</updated>
+    </task>
+    <option name="localTasksCounter" value="3" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -126,5 +209,9 @@
         </entry>
       </map>
     </option>
+  </component>
+  <component name="VcsManagerConfiguration">
+    <MESSAGE value="first commit" />
+    <option name="LAST_COMMIT_MESSAGE" value="first commit" />
   </component>
 </project>

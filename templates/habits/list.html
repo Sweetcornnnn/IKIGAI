@@ -4,6 +4,8 @@
 {% block title %}Habits - IKIGAI{% endblock %}
 
 {% block content %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.2.0/dist/chartjs-plugin-datalabels.min.js"></script>
 <style>
     /* Hide scrollbar */
     ::-webkit-scrollbar {
@@ -87,6 +89,42 @@
         color: var(--text-white);
     }
 
+    /* ─── Chart Wrapper ─── */
+    .chart-wrapper {
+        background: var(--panel-dark);
+        border-radius: 10px;
+        border: 1px solid var(--border-subtle);
+        padding: 16px 20px;
+        margin-bottom: 20px;
+    }
+
+    .chart-wrapper .card-title {
+        font-size: 14px;
+        font-weight: 600;
+        color: var(--text-muted);
+        margin-bottom: 12px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .chart-wrapper .card-title .dropdown {
+        font-size: 12px;
+        color: var(--text-muted);
+        background: rgba(255,255,255,0.04);
+        padding: 2px 10px;
+        border-radius: 4px;
+        border: 1px solid var(--border-subtle);
+        cursor: pointer;
+    }
+
+    .chart-container {
+        position: relative;
+        height: 200px;
+        width: 100%;
+    }
+
+    /* ─── Habit Grid ─── */
     .habit-grid {
         background: var(--panel-dark);
         border-radius: 10px;
@@ -406,6 +444,9 @@
         .habit-summary table td {
             padding: 4px 6px;
         }
+        .chart-container {
+            height: 150px;
+        }
     }
 
     @media (max-width: 480px) {
@@ -444,6 +485,9 @@
         .habit-summary table th,
         .habit-summary table td {
             padding: 3px 4px;
+        }
+        .chart-container {
+            height: 120px;
         }
     }
 </style>
@@ -507,6 +551,17 @@
             <a href="{% url 'habits:add' %}" class="btn-primary" style="margin-top: 10px; display: inline-block;">Create Your First Habit</a>
         </div>
         {% endfor %}
+    </div>
+
+    <!-- ─── Progress Line Chart ─── -->
+    <div class="chart-wrapper">
+        <div class="card-title">
+            <span>📈 Progress Line Chart</span>
+            <span class="dropdown">Month</span>
+        </div>
+        <div class="chart-container">
+            <canvas id="progressLineChart"></canvas>
+        </div>
     </div>
 
     <!-- Stats Section -->
@@ -603,7 +658,6 @@
         const habitId = btn.dataset.habitId;
         const date = btn.dataset.date;
 
-        // Only allow toggling today (the button is only shown for today, but double-check)
         const today = new Date().toISOString().split('T')[0];
         if (date !== today) {
             alert('You can only check habits for today.');
@@ -640,7 +694,6 @@
                     btn.classList.remove('done');
                     btn.textContent = '';
                 }
-                // Refresh to update stats
                 setTimeout(() => location.reload(), 500);
             } else {
                 if (wasDone) {
@@ -665,5 +718,102 @@
             alert('Failed to update habit. Please try again.');
         });
     }
+
+    // ─── Progress Line Chart ───
+    document.addEventListener('DOMContentLoaded', function() {
+        const canvas = document.getElementById('progressLineChart');
+        if (!canvas) {
+            console.error('Chart canvas not found');
+            return;
+        }
+
+        // Get data from Django template
+        const labels = {{ chart_dates|safe }};
+        const data = {{ chart_data|safe }};
+
+        // Check if we have data
+        if (!labels || labels.length === 0 || !data || data.length === 0) {
+            canvas.parentElement.innerHTML = `
+                <div style="display: flex; align-items: center; justify-content: center; height: 100%; color: var(--text-muted); font-size: 14px;">
+                    No progress data available. Start tracking habits!
+                </div>
+            `;
+            return;
+        }
+
+        const ctx = canvas.getContext('2d');
+
+        // Register the datalabels plugin
+        Chart.register(ChartDataLabels);
+
+        new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: 'Daily Progress',
+                    data: data,
+                    borderColor: '#C9A96E',
+                    backgroundColor: 'rgba(201,169,110,0.1)',
+                    fill: true,
+                    tension: 0.3,
+                    pointBackgroundColor: '#C9A96E',
+                    pointBorderColor: '#C9A96E',
+                    pointRadius: 3,
+                    pointHoverRadius: 5,
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        display: false
+                    },
+                    datalabels: {
+                        color: 'rgba(255,255,255,0.7)',
+                        anchor: 'end',
+                        align: 'top',
+                        offset: 4,
+                        font: {
+                            size: 9,
+                            weight: '600'
+                        },
+                        formatter: function(value) {
+                            return value + '%';
+                        },
+                        // Only show if value > 0
+                        display: function(context) {
+                            return context.dataset.data[context.dataIndex] > 0;
+                        }
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        max: 100,
+                        ticks: {
+                            display: false,   // <-- hides Y-axis labels
+                        },
+                        grid: {
+                            color: 'rgba(255,255,255,0.05)'
+                        }
+                    },
+                    x: {
+                        ticks: {
+                            color: 'rgba(255,255,255,0.3)',
+                            font: { size: 10 },
+                            maxRotation: 30,
+                            autoSkip: true,
+                            maxTicksLimit: 15
+                        },
+                        grid: {
+                            display: false
+                        }
+                    }
+                }
+            }
+        });
+    });
 </script>
 {% endblock %}

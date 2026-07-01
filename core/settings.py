@@ -46,6 +46,7 @@ INSTALLED_APPS = [
     'apps.notifications',
     'apps.habits',
     'apps.goals',
+    'apps.admin_dashboard',
 ]
 
 MIDDLEWARE = [

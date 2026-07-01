@@ -25,19 +25,18 @@
 
     .weekly-container {
         max-width: 100%;
-        padding: 0 80px;  /* Reduced padding to 0 */
+        padding: 0 80px;
         margin: 0 auto;
     }
 
     /* ─── Header ─── */
     .weekly-header {
-        display: flex;
-        justify-content: space-between;
+        display: grid;
+        grid-template-columns: 1fr auto 1fr;
         align-items: center;
         padding: 12px 16px;
         border-bottom: 2px solid var(--border-subtle);
         margin-bottom: 16px;
-        flex-wrap: wrap;
         gap: 12px;
     }
 
@@ -45,6 +44,7 @@
         display: flex;
         align-items: center;
         gap: 16px;
+        justify-self: start;
     }
 
     .weekly-header .left .week-range {
@@ -62,12 +62,15 @@
         color: var(--gold);
         letter-spacing: 2px;
         text-transform: uppercase;
+        justify-self: center;
+        text-align: center;
     }
 
     .weekly-header .right {
         display: flex;
         align-items: center;
         gap: 16px;
+        justify-self: end;
     }
 
     .weekly-header .right .nav-btn {
@@ -112,7 +115,7 @@
         border: 1px solid var(--border-subtle);
         border-radius: 6px;
         overflow: hidden;
-        margin: 0 16px 20px 16px;  /* Only side margin for the grid itself */
+        margin: 0 16px 20px 16px;
         background: var(--panel-dark);
     }
 
@@ -185,7 +188,7 @@
         stroke-linecap: round;
         stroke-dasharray: 157.08;
         stroke-dashoffset: 157.08;
-        transition: stroke-dashoffset 0.5s ease;
+        transition: stroke-dashoffset 0.8s ease;
     }
 
     .progress-ring .percentage {
@@ -262,22 +265,6 @@
         color: var(--dark-bg);
     }
 
-    .weekly-grid .day-column .task-list-section .task-item .task-check .high-priority {
-        border-color: var(--danger-red);
-    }
-
-    .weekly-grid .day-column .task-list-section .task-item .task-name {
-        font-size: 12px;
-        color: var(--text-secondary);
-        flex: 1;
-        word-break: break-word;
-    }
-
-    .weekly-grid .day-column .task-list-section .task-item .task-name.done {
-        text-decoration: line-through;
-        color: var(--text-muted);
-    }
-
     .weekly-grid .day-column .task-list-section .task-item .priority-dot {
         width: 6px;
         height: 6px;
@@ -295,6 +282,18 @@
 
     .weekly-grid .day-column .task-list-section .task-item .priority-dot.low {
         background: var(--success-green);
+    }
+
+    .weekly-grid .day-column .task-list-section .task-item .task-name {
+        font-size: 12px;
+        color: var(--text-secondary);
+        flex: 1;
+        word-break: break-word;
+    }
+
+    .weekly-grid .day-column .task-list-section .task-item .task-name.done {
+        text-decoration: line-through;
+        color: var(--text-muted);
     }
 
     .weekly-grid .day-column .task-list-section .empty-tasks {
@@ -402,10 +401,6 @@
         font-size: 12px;
         color: var(--text-secondary);
         margin-bottom: 2px;
-    }
-
-    .analytics-panel .progress-item .progress-label .label {
-        font-weight: 500;
     }
 
     .analytics-panel .progress-item .progress-label .pct {
@@ -650,25 +645,37 @@
         }
         .weekly-header {
             padding: 12px 8px;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+        }
+        .weekly-header .center {
+            order: -1;
+            grid-column: 1 / -1;
+            font-size: 18px;
+        }
+        .weekly-header .left {
+            justify-self: start;
+        }
+        .weekly-header .right {
+            justify-self: end;
         }
     }
 
     @media (max-width: 768px) {
         .weekly-header {
-            flex-direction: column;
-            align-items: stretch;
+            grid-template-columns: 1fr;
             gap: 8px;
             padding: 12px 8px;
         }
         .weekly-header .left {
-            justify-content: center;
+            justify-self: center;
         }
         .weekly-header .center {
             font-size: 16px;
-            text-align: center;
+            grid-column: 1;
         }
         .weekly-header .right {
-            justify-content: center;
+            justify-self: center;
             flex-wrap: wrap;
         }
         .bottom-analytics {
@@ -686,6 +693,9 @@
         }
         .weekly-grid {
             margin: 0 8px 20px 8px;
+        }
+        .weekly-container {
+            padding: 0 16px;
         }
     }
 
@@ -719,6 +729,9 @@
         }
         .weekly-header {
             padding: 10px 4px;
+        }
+        .weekly-container {
+            padding: 0 4px;
         }
     }
 </style>
@@ -757,7 +770,7 @@
                     <svg viewBox="0 0 60 60">
                         <circle class="bg" cx="30" cy="30" r="25"/>
                         <circle class="progress" cx="30" cy="30" r="25"
-                            style="stroke-dashoffset: {{ day_data.percentage|add:'0'|floatformat:'0' }}%;"/>
+                            style="stroke-dashoffset: {{ day_data.offset }}"/>
                     </svg>
                     <div class="percentage {% if day_data.percentage == 100 %}complete{% endif %}">
                         {{ day_data.percentage }}%
@@ -771,7 +784,7 @@
                 {% if day_data.tasks %}
                     {% for task in day_data.tasks %}
                     <div class="task-item" data-task-id="{{ task.id }}">
-                        <button class="task-check {% if task.status == 'COMPLETED' %}done{% endif %}" 
+                        <button class="task-check {% if task.status == 'COMPLETED' %}done{% endif %}"
                                 onclick="toggleTask(this, {{ task.id }})">
                             {% if task.status == 'COMPLETED' %}✓{% endif %}
                         </button>
@@ -959,7 +972,6 @@
         .then(response => response.json())
         .then(data => {
             if (data.success) {
-                // Update button state
                 if (data.completed) {
                     btn.classList.add('done');
                     btn.textContent = '✓';
@@ -969,10 +981,8 @@
                     btn.textContent = '';
                     taskName.classList.remove('done');
                 }
-                // Refresh to update stats
                 setTimeout(() => location.reload(), 400);
             } else {
-                // Revert on error
                 if (wasDone) {
                     btn.classList.add('done');
                     btn.textContent = '✓';
@@ -986,7 +996,6 @@
             }
         })
         .catch(error => {
-            // Revert on error
             if (wasDone) {
                 btn.classList.add('done');
                 btn.textContent = '✓';

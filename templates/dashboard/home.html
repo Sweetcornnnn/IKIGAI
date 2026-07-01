@@ -92,10 +92,10 @@
         margin-top: 4px;
     }
 
-    /* Chart & Calendar Row */
-    .chart-calendar-row {
+    /* Chart - full width now (calendar removed) */
+    .chart-row {
         display: grid;
-        grid-template-columns: 1fr 1fr;
+        grid-template-columns: 1fr;
         gap: 24px;
         margin-bottom: 32px;
     }
@@ -131,156 +131,6 @@
         color: var(--text-muted);
         text-align: center;
         opacity: 0.6;
-    }
-
-    .calendar-container {
-        background-color: var(--panel-dark);
-        border-radius: 12px;
-        padding: 24px;
-        border: 1px solid var(--border-subtle);
-    }
-
-    .calendar-header {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        margin-bottom: 16px;
-    }
-
-    .calendar-header h3 {
-        font-size: 16px;
-        font-weight: 700;
-    }
-
-    .calendar-header span {
-        color: var(--text-muted);
-        font-size: 12px;
-    }
-
-    .calendar-grid {
-        display: grid;
-        grid-template-columns: repeat(7, 1fr);
-        gap: 4px;
-        text-align: center;
-    }
-
-    .calendar-day-label {
-        font-size: 10px;
-        color: var(--text-muted);
-        font-weight: 600;
-        padding: 4px;
-    }
-
-    .calendar-empty {
-        padding: 4px;
-    }
-
-    .calendar-day {
-        padding: 4px;
-        font-size: 12px;
-        border-radius: 4px;
-        position: relative;
-    }
-
-    .calendar-day.has-due {
-        background-color: rgba(201, 169, 110, 0.15);
-        border: 1px solid rgba(201, 169, 110, 0.3);
-    }
-
-    .calendar-day.has-completed {
-        background-color: rgba(111, 175, 138, 0.15);
-        border: 1px solid var(--success-green);
-    }
-
-    .calendar-dots {
-        display: flex;
-        justify-content: center;
-        gap: 2px;
-        margin-top: 2px;
-    }
-
-    .dot-completed {
-        font-size: 6px;
-        color: var(--success-green);
-    }
-
-    .dot-due {
-        font-size: 6px;
-        color: var(--gold);
-    }
-
-    .calendar-legend {
-        margin-top: 12px;
-        display: flex;
-        gap: 16px;
-        justify-content: center;
-        font-size: 11px;
-        color: var(--text-muted);
-        flex-wrap: wrap;
-    }
-
-    .legend-due {
-        color: var(--gold);
-    }
-
-    .legend-completed {
-        color: var(--success-green);
-    }
-
-    /* Category Stats */
-    .category-container {
-        background-color: var(--panel-dark);
-        border-radius: 12px;
-        padding: 24px;
-        border: 1px solid var(--border-subtle);
-        margin-bottom: 32px;
-    }
-
-    .category-container h3 {
-        font-size: 16px;
-        font-weight: 700;
-        margin-bottom: 16px;
-    }
-
-    .category-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-        gap: 12px;
-    }
-
-    .category-item {
-        background-color: rgba(255,255,255,0.02);
-        border-radius: 8px;
-        padding: 12px 16px;
-        border: 1px solid var(--border-subtle);
-    }
-
-    .category-name {
-        font-size: 13px;
-        font-weight: 600;
-        color: var(--text-white);
-    }
-
-    .category-progress {
-        display: flex;
-        justify-content: space-between;
-        font-size: 12px;
-        color: var(--text-muted);
-        margin-top: 4px;
-    }
-
-    .category-bar {
-        background-color: rgba(255,255,255,0.04);
-        border-radius: 4px;
-        height: 4px;
-        margin-top: 4px;
-        overflow: hidden;
-    }
-
-    .category-bar-fill {
-        background-color: var(--gold);
-        height: 100%;
-        border-radius: 4px;
     }
 
     /* Recent Activity & Tasks */
@@ -413,7 +263,6 @@
             gap: 16px;
         }
 
-        .chart-calendar-row,
         .recent-row {
             grid-template-columns: 1fr !important;
         }
@@ -456,7 +305,7 @@
     </div>
 </div>
 
-<!-- Task Stats -->
+<!-- Task Stats (Completion Rate removed) -->
 <div class="task-stats">
     <div class="stat-card">
         <div class="number" style="font-size: 20px; color: var(--text-white);">{{ total_tasks }}</div>
@@ -474,16 +323,7 @@
         <div class="number" style="font-size: 20px; color: var(--danger-red);">{{ overdue_tasks }}</div>
         <div class="label">Overdue</div>
     </div>
-    <div class="stat-card">
-        <div class="number" style="font-size: 20px; color: var(--text-muted);">
-            {% if total_tasks > 0 %}
-                {{ completed_tasks|floatformat:0 }}%
-            {% else %}
-                0%
-            {% endif %}
-        </div>
-        <div class="label">Completion Rate</div>
-    </div>
+    <!-- Completion Rate card removed -->
 </div>
 
 <!-- Habits Section -->
@@ -544,9 +384,8 @@
     </div>
 </div>
 
-<!-- Chart & Calendar Row -->
-<div class="chart-calendar-row">
-    <!-- Chart -->
+<!-- Chart Only (full width, calendar removed) -->
+<div class="chart-row">
     <div class="chart-container">
         <h3>📊 Weekly Progress</h3>
         <div class="chart-wrapper">
@@ -556,77 +395,7 @@
             {{ chart_labels|join:" · " }}
         </div>
     </div>
-
-    <!-- Calendar -->
-    <div class="calendar-container">
-        <div class="calendar-header">
-            <h3>📅 {{ today|date:"F Y" }}</h3>
-            <span>{{ calendar_tasks_count }} events</span>
-        </div>
-        <div class="calendar-grid">
-            {% for day in "SMTWTFS" %}
-            <div class="calendar-day-label">{{ day }}</div>
-            {% endfor %}
-
-            {% with first_day=today|date:"Y-m-01"|date:"w" %}
-                {% for i in "123456"|make_list %}
-                    {% if forloop.counter0|add:1 <= first_day|add:"0" %}
-                    <div class="calendar-empty"></div>
-                    {% endif %}
-                {% endfor %}
-
-                {% with days_in_month=today|date:"t"|add:"0" %}
-                {% for day in days_in_month|make_list %}
-                {% with date_str=today|date:"Y-m-"|add:day %}
-                {% with day_events=calendar_data|get_item:date_str %}
-                <div class="calendar-day {% if day_events %}{% for event in day_events %}{% if event.type == 'completed' %}has-completed{% elif event.type == 'due' %}has-due{% endif %}{% endfor %}{% endif %}">
-                    {{ day }}
-                    {% if day_events %}
-                        <div class="calendar-dots">
-                            {% for event in day_events %}
-                                {% if event.type == 'completed' %}
-                                    <span class="dot-completed">●</span>
-                                {% elif event.type == 'due' %}
-                                    <span class="dot-due">●</span>
-                                {% endif %}
-                            {% endfor %}
-                        </div>
-                    {% endif %}
-                </div>
-                {% endwith %}
-                {% endwith %}
-                {% endfor %}
-                {% endwith %}
-            {% endwith %}
-        </div>
-        <div class="calendar-legend">
-            <span>● <span class="legend-due">Task due</span></span>
-            <span>● <span class="legend-completed">Task completed</span></span>
-            <span>○ No activity</span>
-        </div>
-    </div>
 </div>
-
-<!-- Category Stats -->
-{% if category_stats %}
-<div class="category-container">
-    <h3>📂 Category Breakdown</h3>
-    <div class="category-grid">
-        {% for category, stats in category_stats.items %}
-        <div class="category-item">
-            <div class="category-name">{{ category }}</div>
-            <div class="category-progress">
-                <span>{{ stats.completed }}/{{ stats.total }}</span>
-                <span>{{ stats.percentage }}%</span>
-            </div>
-            <div class="category-bar">
-                <div class="category-bar-fill" style="width: {{ stats.percentage }}%;"></div>
-            </div>
-        </div>
-        {% endfor %}
-    </div>
-</div>
-{% endif %}
 
 <!-- Recent Activity & Recent Tasks -->
 <div class="recent-row">

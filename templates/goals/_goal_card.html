@@ -1,6 +1,6 @@
 {% load static %}
 
-<div class="goal-item {% if completed %}completed-goal{% endif %}">
+<div class="goal-item {% if completed %}completed-goal{% endif %}" data-goal-id="{{ goal.id }}">
     <span class="goal-emoji">{{ goal.emoji }}</span>
     <span class="goal-title {% if goal.completed %}done{% endif %}">{{ goal.title }}</span>
     <button class="goal-check {% if goal.completed %}done{% endif %}"
@@ -8,3 +8,18 @@
         {% if goal.completed %}✓{% endif %}
     </button>
 </div>
+
+<script>
+    // ─── Right-click handler for goal items ───
+    document.addEventListener('DOMContentLoaded', function() {
+        document.querySelectorAll('.goal-item').forEach(function(item) {
+            item.addEventListener('contextmenu', function(e) {
+                e.preventDefault();
+                const goalId = this.dataset.goalId;
+                if (goalId) {
+                    openGoalDetailModal(goalId);
+                }
+            });
+        });
+    });
+</script>

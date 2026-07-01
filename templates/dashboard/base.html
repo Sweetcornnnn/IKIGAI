@@ -9,7 +9,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
         :root {
-            --gold: rgb(255 130 7 / 0.87);
+            --gold: rgb(255 144 0);
             --gold-light: rgba(201, 169, 110, 0.12);
             --dark-bg: #0a0f18;
             --panel-dark: #111827;
@@ -460,5 +460,60 @@
         setInterval(updateNotificationCount, 30000);
         document.addEventListener('DOMContentLoaded', updateNotificationCount);
     </script>
+    <script>
+    // ─── Admin Login Easter Egg: 7 clicks on IKIGAI title ───
+    (function() {
+        let clickCount = 0;
+        let timer = null;
+
+        // Find the IKIGAI title in the navbar
+        const titleElement = document.querySelector('.navbar-brand, .brand, a[href="{% url "dashboard:home" %}"]');
+
+        if (titleElement) {
+            titleElement.addEventListener('click', function(e) {
+                e.preventDefault();
+                clickCount++;
+
+                // Clear previous timer
+                if (timer) {
+                    clearTimeout(timer);
+                }
+
+                // Reset after 3 seconds of inactivity
+                timer = setTimeout(() => {
+                    clickCount = 0;
+                }, 3000);
+
+                // If 7 clicks detected
+                if (clickCount === 7) {
+                    clickCount = 0;
+                    clearTimeout(timer);
+
+                    // Check if user is already admin
+                    fetch('/admin-dashboard/check/')
+                        .then(response => response.json())
+                        .then(data => {
+                            if (data.is_admin) {
+                                window.location.href = '/admin-dashboard/';
+                            } else {
+                                // Show a subtle prompt or redirect to admin login
+                                if (confirm('🔐 Admin Access: Enter administrator credentials to continue.')) {
+                                    window.location.href = '/admin-dashboard/login/?next=/admin-dashboard/';
+                                }
+                            }
+                        })
+                        .catch(() => {
+                            // If check fails, go to login
+                            window.location.href = '/admin-dashboard/login/';
+                        });
+                }
+            });
+
+            // Add a subtle hint on hover
+            titleElement.style.cursor = 'pointer';
+            titleElement.title = '👀';
+        }
+    })();
+</script>
 </body>
 </html>

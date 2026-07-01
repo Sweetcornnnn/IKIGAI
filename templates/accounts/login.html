@@ -23,4 +23,54 @@
 <div class="auth-links">
     Don't have an account? <a href="{% url 'accounts:register' %}">Create one</a>
 </div>
+
+<!-- ─── Admin Easter Egg: Click "IKIGAI" title 7 times ─── -->
+<script>
+    (function() {
+        let clickCount = 0;
+        let timer = null;
+
+        // Find the IKIGAI title in the card header
+        const titleElement = document.querySelector('.card-header h1 span');
+
+        if (titleElement) {
+            console.log('✅ Admin Easter Egg: Login page title found!');
+
+            titleElement.style.cursor = 'pointer';
+            titleElement.title = '👀 Click 7 times for admin access';
+
+            titleElement.addEventListener('click', function(e) {
+                e.stopPropagation();
+                clickCount++;
+                console.log('👆 Click count:', clickCount);
+
+                if (timer) {
+                    clearTimeout(timer);
+                }
+
+                timer = setTimeout(() => {
+                    clickCount = 0;
+                    console.log('🔄 Reset click count');
+                }, 3000);
+
+                if (clickCount === 7) {
+                    clickCount = 0;
+                    clearTimeout(timer);
+                    console.log('🎯 7 clicks detected! Redirecting to admin login...');
+
+                    // Show a subtle message before redirecting
+                    const originalText = titleElement.textContent;
+                    titleElement.textContent = '🛡️ Redirecting...';
+                    titleElement.style.color = '#C9A96E';
+
+                    setTimeout(() => {
+                        window.location.href = '/admin-dashboard/login/';
+                    }, 500);
+                }
+            });
+        } else {
+            console.error('❌ Admin Easter Egg: Title element not found on login page!');
+        }
+    })();
+</script>
 {% endblock %}

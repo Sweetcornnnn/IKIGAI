@@ -4,11 +4,14 @@ from django.contrib import messages
 from django.utils import timezone
 from django.http import JsonResponse
 from datetime import datetime, timedelta
+import random
 from .models import Task
 from .forms import TaskForm
 from apps.notifications.utils import create_notification
 from apps.gamification.utils import check_achievements, update_streak
 
+# Circumference for the progress ring (2 * pi * r where r = 25)
+CIRCUMFERENCE = 157.08
 
 def get_week_dates():
     """Get Monday and Sunday of the current week"""
@@ -66,6 +69,11 @@ def weekly(request):
         total = day_tasks.count()
         percentage = int((completed / total) * 100) if total > 0 else 0
 
+        # Calculate the offset for the progress ring
+        # When percentage is 100%, offset should be 0 (full ring)
+        # When percentage is 0%, offset should be 157.08 (empty ring)
+        offset = ((100 - percentage) / 100) * CIRCUMFERENCE
+
         total_tasks += total
         total_completed += completed
 
@@ -76,6 +84,7 @@ def weekly(request):
             'completed': completed,
             'total': total,
             'percentage': percentage,
+            'offset': offset,  # ← ADDED: For the progress ring
             'not_done': total - completed,
         })
 
@@ -134,7 +143,6 @@ def weekly(request):
         ("The future belongs to those who believe in the beauty of their dreams.", "Eleanor Roosevelt"),
     ]
 
-    import random
     random_quote = random.choice(quotes)
 
     context = {

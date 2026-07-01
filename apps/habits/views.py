@@ -89,6 +89,22 @@ def habit_list(request):
             'longest_streak': habit.get_longest_streak(),
         })
 
+    # ============================================
+    # FIXED: Chart data calculation (moved outside the habit loop)
+    # ============================================
+    chart_dates = []
+    chart_data = []
+    for day in days:
+        chart_dates.append(day.strftime('%d %b'))
+        # Count completions for this day (using HabitLog)
+        day_completed = HabitLog.objects.filter(
+            user=user,
+            date=day,
+            completed=True
+        ).count()
+        percentage = int((day_completed / total_habits) * 100) if total_habits > 0 else 0
+        chart_data.append(percentage)
+
     # Current streak for today (all habits completed today?)
     today_completed = HabitLog.objects.filter(
         user=user,
@@ -117,6 +133,8 @@ def habit_list(request):
         'today': today,
         'first_day': first_day,
         'last_day': last_day,
+        'chart_dates': chart_dates,   # <-- now defined
+        'chart_data': chart_data,     # <-- now defined
     }
 
     return render(request, 'habits/list.html', context)

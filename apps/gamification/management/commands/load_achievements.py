@@ -7,7 +7,7 @@ class Command(BaseCommand):
 
     def handle(self, *args, **kwargs):
         achievements = [
-            # Task achievements
+            # ─── Task achievements ───
             {
                 'name': 'First Steps',
                 'description': 'Complete your first task',
@@ -29,6 +29,16 @@ class Command(BaseCommand):
                 'order': 2,
             },
             {
+                'name': 'Task Collector',
+                'description': 'Complete 25 tasks',
+                'category': 'TASKS',
+                'icon': '📚',
+                'requirement_type': 'TASKS_COMPLETED',
+                'requirement_value': 25,
+                'xp_reward': 35,
+                'order': 3,
+            },
+            {
                 'name': 'Task Master',
                 'description': 'Complete 50 tasks',
                 'category': 'TASKS',
@@ -36,7 +46,17 @@ class Command(BaseCommand):
                 'requirement_type': 'TASKS_COMPLETED',
                 'requirement_value': 50,
                 'xp_reward': 50,
-                'order': 3,
+                'order': 4,
+            },
+            {
+                'name': 'Task Champion',
+                'description': 'Complete 75 tasks',
+                'category': 'TASKS',
+                'icon': '🏅',
+                'requirement_type': 'TASKS_COMPLETED',
+                'requirement_value': 75,
+                'xp_reward': 75,
+                'order': 5,
             },
             {
                 'name': 'Productivity Legend',
@@ -46,7 +66,17 @@ class Command(BaseCommand):
                 'requirement_type': 'TASKS_COMPLETED',
                 'requirement_value': 100,
                 'xp_reward': 100,
-                'order': 4,
+                'order': 6,
+            },
+            {
+                'name': 'Task Overlord',
+                'description': 'Complete 250 tasks',
+                'category': 'TASKS',
+                'icon': '👑',
+                'requirement_type': 'TASKS_COMPLETED',
+                'requirement_value': 250,
+                'xp_reward': 150,
+                'order': 7,
             },
             {
                 'name': 'Task God',
@@ -56,10 +86,20 @@ class Command(BaseCommand):
                 'requirement_type': 'TASKS_COMPLETED',
                 'requirement_value': 500,
                 'xp_reward': 250,
-                'order': 5,
+                'order': 8,
+            },
+            {
+                'name': 'Daily Grind',
+                'description': 'Complete at least 1 task for 7 days straight',
+                'category': 'TASKS',
+                'icon': '⚡',
+                'requirement_type': 'STREAK_DAYS',
+                'requirement_value': 7,
+                'xp_reward': 40,
+                'order': 9,
             },
 
-            # Streak achievements
+            # ─── Streak achievements ───
             {
                 'name': 'Consistency Beginner',
                 'description': 'Maintain a 3-day streak',
@@ -91,6 +131,16 @@ class Command(BaseCommand):
                 'order': 12,
             },
             {
+                'name': 'Unstoppable',
+                'description': 'Maintain a 21-day streak',
+                'category': 'STREAK',
+                'icon': '🚀',
+                'requirement_type': 'STREAK_DAYS',
+                'requirement_value': 21,
+                'xp_reward': 60,
+                'order': 13,
+            },
+            {
                 'name': 'Dedicated Achiever',
                 'description': 'Maintain a 30-day streak',
                 'category': 'STREAK',
@@ -98,7 +148,17 @@ class Command(BaseCommand):
                 'requirement_type': 'STREAK_DAYS',
                 'requirement_value': 30,
                 'xp_reward': 100,
-                'order': 13,
+                'order': 14,
+            },
+            {
+                'name': 'Indomitable',
+                'description': 'Maintain a 60-day streak',
+                'category': 'STREAK',
+                'icon': '💪',
+                'requirement_type': 'STREAK_DAYS',
+                'requirement_value': 60,
+                'xp_reward': 150,
+                'order': 15,
             },
             {
                 'name': 'Iron Will',
@@ -108,10 +168,10 @@ class Command(BaseCommand):
                 'requirement_type': 'STREAK_DAYS',
                 'requirement_value': 100,
                 'xp_reward': 300,
-                'order': 14,
+                'order': 16,
             },
 
-            # Level achievements
+            # ─── Level achievements ───
             {
                 'name': 'Level 5',
                 'description': 'Reach level 5',
@@ -133,6 +193,16 @@ class Command(BaseCommand):
                 'order': 21,
             },
             {
+                'name': 'Level 15',
+                'description': 'Reach level 15',
+                'category': 'LEVEL',
+                'icon': '⭐',
+                'requirement_type': 'LEVEL_REACHED',
+                'requirement_value': 15,
+                'xp_reward': 60,
+                'order': 22,
+            },
+            {
                 'name': 'Level 25',
                 'description': 'Reach level 25',
                 'category': 'LEVEL',
@@ -140,18 +210,30 @@ class Command(BaseCommand):
                 'requirement_type': 'LEVEL_REACHED',
                 'requirement_value': 25,
                 'xp_reward': 100,
-                'order': 22,
+                'order': 23,
+            },
+            {
+                'name': 'Level 30',
+                'description': 'Reach level 30',
+                'category': 'LEVEL',
+                'icon': '✨',
+                'requirement_type': 'LEVEL_REACHED',
+                'requirement_value': 30,
+                'xp_reward': 120,
+                'order': 24,
             },
             {
                 'name': 'Level 50',
                 'description': 'Reach level 50',
                 'category': 'LEVEL',
-                'icon': '✨',
+                'icon': '👑',
                 'requirement_type': 'LEVEL_REACHED',
                 'requirement_value': 50,
                 'xp_reward': 200,
-                'order': 23,
+                'order': 25,
             },
+
+            # ─── Habit achievements ───
             {
                 'name': 'Habit Starter',
                 'description': 'Create your first habit',
@@ -159,28 +241,70 @@ class Command(BaseCommand):
                 'icon': '🌱',
                 'requirement_type': 'HABITS_CREATED',
                 'requirement_value': 1,
-                'xp_reward': 15,
+                'xp_reward': 10,
                 'order': 30,
             },
             {
                 'name': 'Habit Builder',
                 'description': 'Create 5 habits',
                 'category': 'HABITS',
-                'icon': '🌿',
+                'icon': '📋',
                 'requirement_type': 'HABITS_CREATED',
                 'requirement_value': 5,
-                'xp_reward': 30,
+                'xp_reward': 25,
                 'order': 31,
             },
             {
                 'name': 'Habit Master',
-                'description': 'Complete all habits for 7 days in a row',
+                'description': 'Complete 100 habit check-ins',
                 'category': 'HABITS',
-                'icon': '🌳',
+                'icon': '⭐',
                 'requirement_type': 'HABITS_COMPLETED',
-                'requirement_value': 7,
+                'requirement_value': 100,
                 'xp_reward': 50,
                 'order': 32,
+            },
+            {
+                'name': 'Consistency King',
+                'description': 'Complete 500 habit check-ins',
+                'category': 'HABITS',
+                'icon': '👑',
+                'requirement_type': 'HABITS_COMPLETED',
+                'requirement_value': 500,
+                'xp_reward': 100,
+                'order': 33,
+            },
+
+            # ─── Special achievements ───
+            {
+                'name': 'Explorer',
+                'description': 'Create at least one habit, one goal, and complete 5 tasks',
+                'category': 'SPECIAL',
+                'icon': '🗺️',
+                'requirement_type': 'COMBO_ACHIEVEMENT',
+                'requirement_value': 1,
+                'xp_reward': 30,
+                'order': 40,
+            },
+            {
+                'name': 'Morning Person',
+                'description': 'Complete ALL habits before 9 AM',
+                'category': 'SPECIAL',
+                'icon': '🌅',
+                'requirement_type': 'MORNING_PERSON',
+                'requirement_value': 1,
+                'xp_reward': 25,
+                'order': 41,
+            },
+            {
+                'name': 'Perfect Day',
+                'description': 'Complete ALL habits AND tasks on the same day',
+                'category': 'SPECIAL',
+                'icon': '🌈',
+                'requirement_type': 'PERFECT_DAY',
+                'requirement_value': 1,
+                'xp_reward': 50,
+                'order': 42,
             },
         ]
 
@@ -190,8 +314,8 @@ class Command(BaseCommand):
                 defaults=data
             )
             if created:
-                self.stdout.write(self.style.SUCCESS(f'Created achievement: {achievement.name}'))
+                self.stdout.write(self.style.SUCCESS(f'✅ Created achievement: {achievement.name}'))
             else:
-                self.stdout.write(self.style.WARNING(f'Achievement already exists: {achievement.name}'))
+                self.stdout.write(self.style.WARNING(f'⚠️ Achievement already exists: {achievement.name}'))
 
-        self.stdout.write(self.style.SUCCESS('All achievements loaded successfully!'))
+        self.stdout.write(self.style.SUCCESS('🎉 All achievements loaded successfully!'))
