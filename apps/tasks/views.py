@@ -239,7 +239,7 @@ def task_toggle(request, pk):
                 notification_type='TASK_COMPLETED',
                 title=f'Task Completed: {task.title} ✅',
                 message=f'You earned {task.xp_reward} XP for completing "{task.title}"',
-                link='/tasks/weekly/'
+                link='/tasks/'
             )
 
             completed = True

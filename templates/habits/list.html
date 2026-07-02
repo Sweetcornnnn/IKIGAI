@@ -766,6 +766,11 @@
             options: {
                 responsive: true,
                 maintainAspectRatio: false,
+                layout: {
+                    padding: {
+                        top: 20   // Add extra top padding so labels at 100% don't get cut off
+                    }
+                },
                 plugins: {
                     legend: {
                         display: false

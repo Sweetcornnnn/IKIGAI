@@ -5,32 +5,13 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="76db4c93-058d-48aa-8f5b-ed13a09c349a" name="Changes" comment="first commit">
-      <change afterPath="$PROJECT_DIR$/apps/admin_dashboard/urls.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/apps/gamification/management/commands/check_achievements.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/templates/admin_dashboard/base.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/templates/admin_dashboard/index.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/templates/admin_dashboard/login.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/templates/admin_dashboard/system.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/templates/admin_dashboard/users.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/apps/gamification/management/commands/load_achievements.py" beforeDir="false" afterPath="$PROJECT_DIR$/apps/gamification/management/commands/load_achievements.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/apps/gamification/models.py" beforeDir="false" afterPath="$PROJECT_DIR$/apps/gamification/models.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/apps/gamification/utils.py" beforeDir="false" afterPath="$PROJECT_DIR$/apps/gamification/utils.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/apps/goals/urls.py" beforeDir="false" afterPath="$PROJECT_DIR$/apps/goals/urls.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/apps/goals/views.py" beforeDir="false" afterPath="$PROJECT_DIR$/apps/goals/views.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/apps/habits/views.py" beforeDir="false" afterPath="$PROJECT_DIR$/apps/habits/views.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/apps/tasks/views.py" beforeDir="false" afterPath="$PROJECT_DIR$/apps/tasks/views.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/core/settings.py" beforeDir="false" afterPath="$PROJECT_DIR$/core/settings.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/core/urls.py" beforeDir="false" afterPath="$PROJECT_DIR$/core/urls.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/db.sqlite3" beforeDir="false" afterPath="$PROJECT_DIR$/db.sqlite3" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/templates/accounts/base.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/accounts/base.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/templates/accounts/login.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/accounts/login.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/templates/dashboard/base.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/dashboard/base.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/templates/dashboard/home.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/dashboard/home.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/templates/goals/_goal_card.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/goals/_goal_card.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/templates/goals/dashboard.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/goals/dashboard.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/templates/accounts/register.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/accounts/register.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/templates/habits/list.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/habits/list.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/templates/tasks/weekly.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/tasks/weekly.html" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -38,7 +19,7 @@
     <option name="LAST_RESOLUTION" value="IGNORE" />
   </component>
   <component name="EmbeddingIndexingInfo">
-    <option name="cachedIndexableFilesCount" value="110" />
+    <option name="cachedIndexableFilesCount" value="124" />
   </component>
   <component name="FileTemplateManagerImpl">
     <option name="RECENT_TEMPLATES">
@@ -51,18 +32,18 @@
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
-  <component name="GitHubPullRequestSearchHistory"><![CDATA[{
-  "lastFilter": {
-    "state": "OPEN",
-    "assignee": "Sweetcornnnn"
+  <component name="GitHubPullRequestSearchHistory">{
+  &quot;lastFilter&quot;: {
+    &quot;state&quot;: &quot;OPEN&quot;,
+    &quot;assignee&quot;: &quot;Sweetcornnnn&quot;
   }
-}]]></component>
-  <component name="GithubPullRequestsUISettings"><![CDATA[{
-  "selectedUrlAndAccountId": {
-    "url": "https://github.com/Sweetcornnnn/IKIGAI.git",
-    "accountId": "592deb0f-0014-4b86-9677-79ec940a3feb"
+}</component>
+  <component name="GithubPullRequestsUISettings">{
+  &quot;selectedUrlAndAccountId&quot;: {
+    &quot;url&quot;: &quot;https://github.com/Sweetcornnnn/IKIGAI.git&quot;,
+    &quot;accountId&quot;: &quot;592deb0f-0014-4b86-9677-79ec940a3feb&quot;
   }
-}]]></component>
+}</component>
   <component name="McpProjectServerCommands">
     <commands />
     <urls />
@@ -138,25 +119,25 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "DefaultHtmlFileTemplate": "HTML File",
-    "Git.Working.Tree.Tab.closed.by.user": "closed",
-    "ModuleVcsDetector.initialDetectionPerformed": "true",
-    "RunOnceActivity.MCP Project settings loaded": "true",
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252": "true",
-    "RunOnceActivity.git.unshallow": "true",
-    "RunOnceActivity.typescript.service.memoryLimit.init": "true",
-    "codeWithMe.voiceChat.enabledByDefault": "false",
-    "git-widget-placeholder": "master",
-    "node.js.detected.package.eslint": "true",
-    "node.js.detected.package.tslint": "true",
-    "node.js.selected.package.eslint": "(autodetect)",
-    "node.js.selected.package.tslint": "(autodetect)",
-    "nodejs_package_manager_path": "npm"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;DefaultHtmlFileTemplate&quot;: &quot;HTML File&quot;,
+    &quot;Git.Working.Tree.Tab.closed.by.user&quot;: &quot;closed&quot;,
+    &quot;ModuleVcsDetector.initialDetectionPerformed&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.MCP Project settings loaded&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.typescript.service.memoryLimit.init&quot;: &quot;true&quot;,
+    &quot;codeWithMe.voiceChat.enabledByDefault&quot;: &quot;false&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;master&quot;,
+    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
+    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
+    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
+    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;
   }
-}]]></component>
+}</component>
   <component name="RecentsManager">
     <key name="MoveFile.RECENT_KEYS">
       <recent name="C:\Users\zolin\PycharmProjects\IKIGAI\templates\accounts" />
