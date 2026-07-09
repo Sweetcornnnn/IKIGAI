@@ -329,12 +329,17 @@
             <span>🛡️</span> IKIGAI Admin
         </a>
         <div class="nav-links">
-            <a href="{% url 'admin_dashboard:dashboard' %}" class="{% if request.resolver_match.url_name == 'dashboard' %}active{% endif %}">Dashboard</a>
-            <a href="{% url 'admin_dashboard:users' %}" class="{% if request.resolver_match.url_name == 'users' %}active{% endif %}">Users</a>
-            <a href="{% url 'admin_dashboard:system' %}" class="{% if request.resolver_match.url_name == 'system' %}active{% endif %}">System</a>
-            <span class="admin-badge">Admin</span>
-            <a href="{% url 'admin_dashboard:logout' %}" class="logout-btn">Logout</a>
-        </div>
+    <a href="{% url 'admin_dashboard:dashboard' %}" class="{% if request.resolver_match.url_name == 'dashboard' %}active{% endif %}">Dashboard</a>
+    <a href="{% url 'admin_dashboard:users' %}" class="{% if request.resolver_match.url_name == 'users' %}active{% endif %}">Users</a>
+    <a href="{% url 'admin_dashboard:model_list' 'tasks' %}">Tasks</a>
+    <a href="{% url 'admin_dashboard:model_list' 'habits' %}">Habits</a>
+    <a href="{% url 'admin_dashboard:model_list' 'goals' %}">Goals</a>
+    <a href="{% url 'admin_dashboard:model_list' 'achievements' %}">Achievements</a>
+    <a href="{% url 'admin_dashboard:model_list' 'notifications' %}">Notifications</a>
+    <a href="{% url 'admin_dashboard:system' %}" class="{% if request.resolver_match.url_name == 'system' %}active{% endif %}">System</a>
+    <span class="admin-badge">Admin</span>
+    <a href="{% url 'admin_dashboard:logout' %}" class="logout-btn">Logout</a>
+</div>
     </nav>
 
     <div class="admin-container">

@@ -1,8 +1,188 @@
 {% extends 'admin_dashboard/base.html' %}
+{% load static %}
 
 {% block title %}Dashboard - Admin{% endblock %}
 
 {% block content %}
+<style>
+    .admin-header {
+        margin-bottom: 24px;
+    }
+    .admin-header h1 {
+        font-size: 28px;
+        font-weight: 700;
+        margin: 0;
+    }
+    .admin-header p {
+        color: var(--text-muted);
+        font-size: 14px;
+        margin-top: 4px;
+    }
+
+    .stats-grid-admin {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+        gap: 16px;
+        margin-bottom: 24px;
+    }
+
+    .stat-card-admin {
+        background: var(--panel-dark);
+        border-radius: 12px;
+        padding: 18px 20px;
+        border: 1px solid var(--border-subtle);
+    }
+
+    .stat-card-admin .number {
+        font-size: 28px;
+        font-weight: 700;
+        color: var(--gold);
+    }
+
+    .stat-card-admin .number.green {
+        color: var(--success-green);
+    }
+    .stat-card-admin .number.red {
+        color: var(--danger-red);
+    }
+    .stat-card-admin .number.blue {
+        color: #6EA8E0;
+    }
+    .stat-card-admin .number.white {
+        color: var(--text-white);
+    }
+
+    .stat-card-admin .label {
+        font-size: 11px;
+        color: var(--text-muted);
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        margin-top: 4px;
+    }
+
+    .admin-grid {
+        display: grid;
+        grid-template-columns: 2fr 1fr;
+        gap: 24px;
+        margin-bottom: 24px;
+    }
+
+    .admin-panel {
+        background: var(--panel-dark);
+        border-radius: 12px;
+        padding: 20px 24px;
+        border: 1px solid var(--border-subtle);
+    }
+
+    .admin-panel .panel-title {
+        font-size: 14px;
+        font-weight: 600;
+        color: var(--text-muted);
+        margin-bottom: 12px;
+        padding-bottom: 8px;
+        border-bottom: 1px solid var(--border-subtle);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .activity-item {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 8px 0;
+        border-bottom: 1px solid rgba(255,255,255,0.03);
+    }
+    .activity-item:last-child {
+        border-bottom: none;
+    }
+    .activity-item .icon {
+        font-size: 18px;
+    }
+    .activity-item .content {
+        flex: 1;
+    }
+    .activity-item .title {
+        font-size: 13px;
+        color: var(--text-secondary);
+    }
+    .activity-item .time {
+        font-size: 11px;
+        color: var(--text-muted);
+    }
+
+    .data-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+        gap: 8px;
+        padding: 4px 0;
+    }
+
+    .data-link {
+        color: var(--text-secondary);
+        text-decoration: none;
+        padding: 8px 12px;
+        background: rgba(255,255,255,0.02);
+        border-radius: 6px;
+        border: 1px solid var(--border-subtle);
+        font-size: 13px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        transition: all 0.2s;
+    }
+    .data-link:hover {
+        background: rgba(255,255,255,0.05);
+        border-color: rgba(255,255,255,0.12);
+    }
+
+    .sys-stat-row {
+        display: flex;
+        justify-content: space-between;
+        padding: 6px 0;
+        border-bottom: 1px solid rgba(255,255,255,0.03);
+    }
+    .sys-stat-row:last-child {
+        border-bottom: none;
+    }
+    .sys-stat-row .label {
+        color: var(--text-muted);
+    }
+    .sys-stat-row .value {
+        font-weight: 600;
+        color: var(--text-white);
+    }
+    .sys-stat-row .value.gold {
+        color: var(--gold);
+    }
+    .sys-stat-row .value.green {
+        color: var(--success-green);
+    }
+    .sys-stat-row .value.red {
+        color: var(--danger-red);
+    }
+
+    @media (max-width: 768px) {
+        .admin-grid {
+            grid-template-columns: 1fr;
+        }
+        .stats-grid-admin {
+            grid-template-columns: repeat(2, 1fr);
+        }
+        .data-grid {
+            grid-template-columns: 1fr 1fr;
+        }
+    }
+    @media (max-width: 480px) {
+        .stats-grid-admin {
+            grid-template-columns: 1fr 1fr;
+        }
+        .data-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>
+
 <div class="admin-header">
     <h1>Admin Dashboard</h1>
     <p>Welcome back, <strong>{{ user.username }}</strong> — here's what's happening across the platform.</p>
@@ -35,6 +215,22 @@
     </div>
 </div>
 
+<!-- ─── Data Management Links ─── -->
+<div class="admin-panel" style="margin-bottom: 24px;">
+    <div class="panel-title">📦 Data Management</div>
+    <div class="data-grid">
+        <a href="{% url 'admin_dashboard:model_list' 'users' %}" class="data-link">👤 Users</a>
+        <a href="{% url 'admin_dashboard:model_list' 'profiles' %}" class="data-link">📋 Profiles</a>
+        <a href="{% url 'admin_dashboard:model_list' 'tasks' %}" class="data-link">✅ Tasks</a>
+        <a href="{% url 'admin_dashboard:model_list' 'habits' %}" class="data-link">🌱 Habits</a>
+        <a href="{% url 'admin_dashboard:model_list' 'habitlogs' %}" class="data-link">📊 Habit Logs</a>
+        <a href="{% url 'admin_dashboard:model_list' 'goals' %}" class="data-link">🎯 Goals</a>
+        <a href="{% url 'admin_dashboard:model_list' 'achievements' %}" class="data-link">🏆 Achievements</a>
+        <a href="{% url 'admin_dashboard:model_list' 'userachievements' %}" class="data-link">🎖️ User Achievements</a>
+        <a href="{% url 'admin_dashboard:model_list' 'notifications' %}" class="data-link">🔔 Notifications</a>
+    </div>
+</div>
+
 <div class="admin-grid">
     <!-- Recent Activity -->
     <div class="admin-panel">
@@ -61,29 +257,27 @@
 
     <!-- System Stats -->
     <div class="admin-panel">
-        <div class="panel-title">
-            📊 System Stats
-        </div>
-        <div style="padding: 4px 0;">
-            <div style="display: flex; justify-content: space-between; padding: 6px 0; border-bottom: 1px solid rgba(255,255,255,0.03);">
-                <span style="color: var(--text-muted);">Total Habits</span>
-                <span style="font-weight: 600; color: var(--text-white);">{{ total_habits }}</span>
+        <div class="panel-title">📊 System Stats</div>
+        <div>
+            <div class="sys-stat-row">
+                <span class="label">Total Habits</span>
+                <span class="value">{{ total_habits }}</span>
             </div>
-            <div style="display: flex; justify-content: space-between; padding: 6px 0; border-bottom: 1px solid rgba(255,255,255,0.03);">
-                <span style="color: var(--text-muted);">Today's Habit Completions</span>
-                <span style="font-weight: 600; color: var(--admin-green);">{{ habit_logs }}</span>
+            <div class="sys-stat-row">
+                <span class="label">Today's Habit Completions</span>
+                <span class="value green">{{ habit_logs }}</span>
             </div>
-            <div style="display: flex; justify-content: space-between; padding: 6px 0; border-bottom: 1px solid rgba(255,255,255,0.03);">
-                <span style="color: var(--text-muted);">Achievements Unlocked</span>
-                <span style="font-weight: 600; color: var(--admin-gold);">{{ unlocked_achievements }}</span>
+            <div class="sys-stat-row">
+                <span class="label">Achievements Unlocked</span>
+                <span class="value gold">{{ unlocked_achievements }}</span>
             </div>
-            <div style="display: flex; justify-content: space-between; padding: 6px 0; border-bottom: 1px solid rgba(255,255,255,0.03);">
-                <span style="color: var(--text-muted);">Total Notifications</span>
-                <span style="font-weight: 600; color: var(--text-white);">{{ total_notifications }}</span>
+            <div class="sys-stat-row">
+                <span class="label">Total Notifications</span>
+                <span class="value">{{ total_notifications }}</span>
             </div>
-            <div style="display: flex; justify-content: space-between; padding: 6px 0;">
-                <span style="color: var(--text-muted);">Unread Notifications</span>
-                <span style="font-weight: 600; color: var(--admin-red);">{{ unread_notifications }}</span>
+            <div class="sys-stat-row">
+                <span class="label">Unread Notifications</span>
+                <span class="value red">{{ unread_notifications }}</span>
             </div>
         </div>
     </div>
@@ -92,15 +286,15 @@
 <!-- Quick Stats Row -->
 <div class="stats-grid-admin" style="grid-template-columns: repeat(3, 1fr);">
     <div class="stat-card-admin">
-        <div class="number" style="font-size: 20px; color: var(--text-white);">{{ staff_users }}</div>
+        <div class="number white" style="font-size: 20px;">{{ staff_users }}</div>
         <div class="label">Staff Users</div>
     </div>
     <div class="stat-card-admin">
-        <div class="number" style="font-size: 20px; color: var(--admin-gold);">{{ pending_tasks }}</div>
+        <div class="number gold" style="font-size: 20px;">{{ pending_tasks }}</div>
         <div class="label">Pending Tasks</div>
     </div>
     <div class="stat-card-admin">
-        <div class="number" style="font-size: 20px; color: var(--admin-blue);">{{ unlocked_achievements }}</div>
+        <div class="number blue" style="font-size: 20px;">{{ unlocked_achievements }}</div>
         <div class="label">Unlocked Achievements</div>
     </div>
 </div>

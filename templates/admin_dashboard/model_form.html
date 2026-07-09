@@ -1,0 +1,75 @@
+{% extends 'admin_dashboard/base.html' %}
+{% load admin_filters %}
+
+{% block title %}{{ action }} {{ config.label }} - Admin{% endblock %}
+
+{% block content %}
+<div class="admin-header">
+    <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px;">
+        <div>
+            <h1 style="font-size: 24px; font-weight: 700;">{{ action }} {{ config.icon }} {{ config.label }}</h1>
+            <p style="color: var(--text-muted); font-size: 14px; margin-top: 2px;">
+                {% if action == 'Add' %}Create a new {{ config.label|lower }}{% else %}Edit {{ config.label|lower }}{% endif %}
+            </p>
+        </div>
+        <a href="{% url 'admin_dashboard:model_list' model_name %}" style="padding: 8px 16px; background: rgba(255,255,255,0.04); border: 1px solid var(--border-subtle); border-radius: 6px; color: var(--text-muted); text-decoration: none; font-size: 13px;">← Back to List</a>
+    </div>
+</div>
+
+<div style="background: var(--panel-dark); border-radius: 10px; padding: 24px; border: 1px solid var(--border-subtle); max-width: 800px;">
+    <form method="POST">
+        {% csrf_token %}
+
+        {% for field in config.editable_fields %}
+        <div style="margin-bottom: 16px;">
+            <label style="display: block; font-size: 12px; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 4px;">
+                {{ field|title }}
+            </label>
+
+            {% if field in foreign_key_options %}
+                <select name="{{ field }}" style="width: 100%; padding: 10px 14px; background: rgba(255,255,255,0.04); border: 1px solid var(--border-subtle); border-radius: 6px; color: var(--text-white); font-size: 14px; outline: none;">
+                    <option value="">Select...</option>
+                    {% for option in foreign_key_options|get_item:field %}
+                    <option value="{{ option.id }}" {% if current_values|get_item:field == option.id %}selected{% endif %}>
+                        {{ option }}
+                    </option>
+                    {% endfor %}
+                </select>
+            {% else %}
+                {% with field_obj=instance|attr:field %}
+                    {% if field_obj.choices %}
+                        <select name="{{ field }}" style="width: 100%; padding: 10px 14px; background: rgba(255,255,255,0.04); border: 1px solid var(--border-subtle); border-radius: 6px; color: var(--text-white); font-size: 14px; outline: none;">
+                            {% for value, label in field_obj.choices %}
+                            <option value="{{ value }}" {% if instance and instance|attr:field == value %}selected{% endif %}>
+                                {{ label }}
+                            </option>
+                            {% endfor %}
+                        </select>
+                    {% elif field_obj.boolean %}
+                        <input type="checkbox" name="{{ field }}" {% if instance and instance|attr:field %}checked{% endif %} style="width: 20px; height: 20px; cursor: pointer;">
+                    {% elif field_obj.date %}
+                        <input type="date" name="{{ field }}" value="{% if instance and instance|attr:field %}{{ instance|attr:field|date:'Y-m-d' }}{% endif %}" style="width: 100%; padding: 10px 14px; background: rgba(255,255,255,0.04); border: 1px solid var(--border-subtle); border-radius: 6px; color: var(--text-white); font-size: 14px; outline: none;">
+                    {% elif field_obj.text %}
+                        <textarea name="{{ field }}" rows="3" style="width: 100%; padding: 10px 14px; background: rgba(255,255,255,0.04); border: 1px solid var(--border-subtle); border-radius: 6px; color: var(--text-white); font-size: 14px; outline: none; resize: vertical; font-family: inherit;">{% if instance and instance|attr:field %}{{ instance|attr:field }}{% endif %}</textarea>
+                    {% else %}
+                        <input type="text" name="{{ field }}" value="{% if instance and instance|attr:field %}{{ instance|attr:field }}{% endif %}" style="width: 100%; padding: 10px 14px; background: rgba(255,255,255,0.04); border: 1px solid var(--border-subtle); border-radius: 6px; color: var(--text-white); font-size: 14px; outline: none;" {% if field in config.hidden_fields %}readonly{% endif %}>
+                    {% endif %}
+                {% endwith %}
+            {% endif %}
+        </div>
+        {% endfor %}
+
+        <div style="display: flex; gap: 12px; margin-top: 8px;">
+            <button type="submit" style="padding: 12px 32px; background: var(--gold); color: var(--dark-bg); border: none; border-radius: 6px; font-weight: 700; cursor: pointer; font-size: 14px;">
+                {% if action == 'Add' %}Add {{ config.label }}{% else %}Save Changes{% endif %}
+            </button>
+            <a href="{% url 'admin_dashboard:model_list' model_name %}" style="padding: 12px 24px; background: rgba(255,255,255,0.04); border: 1px solid var(--border-subtle); border-radius: 6px; color: var(--text-muted); text-decoration: none; font-size: 14px;">Cancel</a>
+        </div>
+    </form>
+</div>
+
+<style>
+    .admin-header { margin-bottom: 20px; }
+    .admin-header h1 { font-size: 24px; font-weight: 700; margin: 0; }
+</style>
+{% endblock %}

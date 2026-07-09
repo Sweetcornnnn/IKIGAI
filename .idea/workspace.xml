@@ -4,14 +4,18 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="76db4c93-058d-48aa-8f5b-ed13a09c349a" name="Changes" comment="first commit">
+    <list default="true" id="76db4c93-058d-48aa-8f5b-ed13a09c349a" name="Changes" comment="Adjusted the 100% of nodes to be seen.">
+      <change afterPath="$PROJECT_DIR$/apps/admin_dashboard/templatetags/admin_filters.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/templates/admin_dashboard/model_form.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/templates/admin_dashboard/model_list.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/apps/tasks/views.py" beforeDir="false" afterPath="$PROJECT_DIR$/apps/tasks/views.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/admin_dashboard/urls.py" beforeDir="false" afterPath="$PROJECT_DIR$/apps/admin_dashboard/urls.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/admin_dashboard/views.py" beforeDir="false" afterPath="$PROJECT_DIR$/apps/admin_dashboard/views.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/goals/models.py" beforeDir="false" afterPath="$PROJECT_DIR$/apps/goals/models.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/db.sqlite3" beforeDir="false" afterPath="$PROJECT_DIR$/db.sqlite3" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/templates/accounts/base.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/accounts/base.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/templates/accounts/login.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/accounts/login.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/templates/accounts/register.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/accounts/register.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/templates/habits/list.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/habits/list.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/templates/admin_dashboard/base.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/admin_dashboard/base.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/templates/admin_dashboard/index.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/admin_dashboard/index.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/templates/admin_dashboard/users.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/admin_dashboard/users.html" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -19,7 +23,7 @@
     <option name="LAST_RESOLUTION" value="IGNORE" />
   </component>
   <component name="EmbeddingIndexingInfo">
-    <option name="cachedIndexableFilesCount" value="124" />
+    <option name="cachedIndexableFilesCount" value="125" />
   </component>
   <component name="FileTemplateManagerImpl">
     <option name="RECENT_TEMPLATES">
@@ -50,23 +54,23 @@
   </component>
   <component name="NextEditCompletionFeaturesState">
     <decayedCancelled>
-      <entry key="MS100" value="1.0" />
-      <entry key="MS500" value="1.0" />
-      <entry key="S2" value="1.000000000000022" />
-      <entry key="S5" value="1.0000034456318616" />
-      <entry key="S10" value="1.0018562413263592" />
-      <entry key="S30" value="1.1228979991689672" />
-      <entry key="S60" value="1.3505681091740718" />
-      <entry key="M2" value="1.5920895406600517" />
-      <entry key="M5" value="1.818189433604584" />
-      <entry key="M10" value="2.021427617712164" />
-      <entry key="M15" value="2.240629898274067" />
-      <entry key="M30" value="2.7506782490809396" />
-      <entry key="H1" value="3.235690013100209" />
-      <entry key="H2" value="3.574343340615849" />
-      <entry key="H4" value="3.7749903883281606" />
-      <entry key="D1" value="3.960682838113756" />
-      <entry key="W1" value="3.9943370918062064" />
+      <entry key="MS100" value="1.001343302556905" />
+      <entry key="MS500" value="1.269149911330309" />
+      <entry key="S2" value="2.2424915898003683" />
+      <entry key="S5" value="4.324639666370056" />
+      <entry key="S10" value="6.425568955500977" />
+      <entry key="S30" value="11.879492538964113" />
+      <entry key="S60" value="17.259022360722668" />
+      <entry key="M2" value="22.191877132045445" />
+      <entry key="M5" value="26.430478253412602" />
+      <entry key="M10" value="28.23437841687979" />
+      <entry key="M15" value="29.017609945625576" />
+      <entry key="M30" value="30.113176924539147" />
+      <entry key="H1" value="30.906413633199076" />
+      <entry key="H2" value="31.406227644768105" />
+      <entry key="H4" value="31.689924898047668" />
+      <entry key="D1" value="31.946351676441257" />
+      <entry key="W1" value="31.992285829819274" />
     </decayedCancelled>
     <decayedSelected>
       <entry key="MS100" value="0.0" />
@@ -88,23 +92,23 @@
       <entry key="W1" value="0.0" />
     </decayedSelected>
     <decayedShown>
-      <entry key="MS100" value="0.6830201283771977" />
-      <entry key="MS500" value="0.9265880618903709" />
-      <entry key="S2" value="0.9811189749983398" />
-      <entry key="S5" value="0.992407763002148" />
-      <entry key="S10" value="0.9980356861180361" />
-      <entry key="S30" value="1.1212849311029633" />
-      <entry key="S60" value="1.3494432278995172" />
-      <entry key="M2" value="1.591358217477939" />
-      <entry key="M5" value="1.8178327021035798" />
-      <entry key="M10" value="2.0212134207803336" />
-      <entry key="M15" value="2.240458527680809" />
-      <entry key="M30" value="2.750558421890323" />
-      <entry key="H1" value="3.235613708221695" />
-      <entry key="H2" value="3.5742994478338446" />
-      <entry key="H4" value="3.7749667392958073" />
-      <entry key="D1" value="3.96067863380875" />
-      <entry key="W1" value="3.994336484384837" />
+      <entry key="MS100" value="0.0025879906695104433" />
+      <entry key="MS500" value="0.5315312407259545" />
+      <entry key="S2" value="1.9561379462469255" />
+      <entry key="S5" value="4.19569566672844" />
+      <entry key="S10" value="6.357315197271535" />
+      <entry key="S30" value="11.85352392155153" />
+      <entry key="S60" value="17.24416922124929" />
+      <entry key="M2" value="22.183492511311403" />
+      <entry key="M5" value="26.426764068945417" />
+      <entry key="M10" value="28.232424613122525" />
+      <entry key="M15" value="29.016264758204105" />
+      <entry key="M30" value="30.112462636311108" />
+      <entry key="H1" value="30.90603786537985" />
+      <entry key="H2" value="31.406033365460722" />
+      <entry key="H4" value="31.68982587385118" />
+      <entry key="D1" value="31.946334882425006" />
+      <entry key="W1" value="31.992283423173976" />
     </decayedShown>
   </component>
   <component name="ProjectColorInfo">{
@@ -174,7 +178,23 @@
       <option name="project" value="LOCAL" />
       <updated>1782815604910</updated>
     </task>
-    <option name="localTasksCounter" value="3" />
+    <task id="LOCAL-00003" summary="Added the View Password. The eye.">
+      <option name="closed" value="true" />
+      <created>1782951702782</created>
+      <option name="number" value="00003" />
+      <option name="presentableId" value="LOCAL-00003" />
+      <option name="project" value="LOCAL" />
+      <updated>1782951702782</updated>
+    </task>
+    <task id="LOCAL-00004" summary="Adjusted the 100% of nodes to be seen.">
+      <option name="closed" value="true" />
+      <created>1782951768100</created>
+      <option name="number" value="00004" />
+      <option name="presentableId" value="LOCAL-00004" />
+      <option name="project" value="LOCAL" />
+      <updated>1782951768100</updated>
+    </task>
+    <option name="localTasksCounter" value="5" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -193,6 +213,8 @@
   </component>
   <component name="VcsManagerConfiguration">
     <MESSAGE value="first commit" />
-    <option name="LAST_COMMIT_MESSAGE" value="first commit" />
+    <MESSAGE value="Added the View Password. The eye." />
+    <MESSAGE value="Adjusted the 100% of nodes to be seen." />
+    <option name="LAST_COMMIT_MESSAGE" value="Adjusted the 100% of nodes to be seen." />
   </component>
 </project>

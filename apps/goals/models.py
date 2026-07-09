@@ -24,6 +24,7 @@ class Goal(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
     order = models.IntegerField(default=0)
 
+
     def __str__(self):
         return f"{self.emoji} {self.title}"
 

@@ -1,0 +1,247 @@
+{% extends 'admin_dashboard/base.html' %}
+{% load admin_filters %}
+
+{% block title %}{{ config.label }} - Admin{% endblock %}
+
+{% block content %}
+<div class="admin-header">
+    <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px;">
+        <div>
+            <h1 style="font-size: 24px; font-weight: 700;">{{ config.icon }} {{ config.label }}</h1>
+            <p style="color: var(--text-muted); font-size: 14px; margin-top: 2px;">Manage all {{ config.label|lower }} in the system</p>
+        </div>
+        <div style="display: flex; gap: 12px;">
+            <a href="{% url 'admin_dashboard:dashboard' %}" style="padding: 8px 16px; background: rgba(255,255,255,0.04); border: 1px solid var(--border-subtle); border-radius: 6px; color: var(--text-muted); text-decoration: none; font-size: 13px;">← Back</a>
+            <a href="{% url 'admin_dashboard:model_add' model_name %}" style="padding: 8px 20px; background: var(--gold); color: var(--dark-bg); border: none; border-radius: 6px; font-weight: 600; font-size: 13px; cursor: pointer; text-decoration: none;">+ Add New</a>
+        </div>
+    </div>
+</div>
+
+<!-- Search & Filters -->
+<div style="background: var(--panel-dark); border-radius: 10px; padding: 16px 20px; border: 1px solid var(--border-subtle); margin-bottom: 20px;">
+    <form method="GET" style="display: flex; flex-wrap: wrap; gap: 12px; align-items: center;">
+        <div style="flex: 1; min-width: 200px;">
+            <input type="text" name="q" placeholder="Search..." value="{{ search_query }}" style="width: 100%; padding: 8px 14px; background: rgba(255,255,255,0.04); border: 1px solid var(--border-subtle); border-radius: 6px; color: var(--text-white); font-size: 14px; outline: none;">
+        </div>
+
+        {% for field, choices in filter_options.items %}
+        {% with filter_key="filter_"|add:field %}
+        <select name="{{ filter_key }}" style="padding: 8px 14px; background: rgba(255,255,255,0.04); border: 1px solid var(--border-subtle); border-radius: 6px; color: var(--text-white); font-size: 13px; outline: none;">
+            <option value="">All {{ field|title }}</option>
+            {% for value, label in choices %}
+            <option value="{{ value }}" {% if request.GET|get_item:filter_key == value|stringformat:"s" %}selected{% endif %}>
+                {{ label }}
+            </option>
+            {% endfor %}
+        </select>
+        {% endwith %}
+        {% endfor %}
+
+        <button type="submit" style="padding: 8px 20px; background: var(--gold); color: var(--dark-bg); border: none; border-radius: 6px; font-weight: 600; cursor: pointer;">Filter</button>
+        <a href="{% url 'admin_dashboard:model_list' model_name %}" style="padding: 8px 16px; background: rgba(255,255,255,0.04); border: 1px solid var(--border-subtle); border-radius: 6px; color: var(--text-muted); text-decoration: none; font-size: 13px;">Clear</a>
+    </form>
+</div>
+
+<!-- Bulk Actions -->
+<form id="bulkActionForm" method="POST" action="{% url 'admin_dashboard:bulk_action' model_name %}">
+    {% csrf_token %}
+    <input type="hidden" name="ids" id="bulkIds" value="">
+
+<div style="background: var(--panel-dark); border-radius: 10px; border: 1px solid var(--border-subtle); overflow: hidden; margin-bottom: 20px;">
+    <div style="padding: 10px 16px; background: rgba(255,255,255,0.02); border-bottom: 1px solid var(--border-subtle); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px;">
+        <div style="display: flex; align-items: center; gap: 12px;">
+            <input type="checkbox" id="selectAll" style="width: 16px; height: 16px; cursor: pointer;">
+            <span style="font-size: 12px; color: var(--text-muted);">{{ page_obj.paginator.count }} records</span>
+        </div>
+        <div style="display: flex; gap: 8px; align-items: center;">
+            <select id="bulkActionSelect" style="padding: 6px 12px; background: rgba(255,255,255,0.04); border: 1px solid var(--border-subtle); border-radius: 4px; color: var(--text-white); font-size: 12px; outline: none;">
+                <option value="">Bulk Actions</option>
+                <option value="delete">Delete Selected</option>
+                {% if model_name == 'notifications' %}
+                <option value="mark_read">Mark as Read</option>
+                {% endif %}
+                {% if model_name == 'habits' %}
+                <option value="mark_active">Activate</option>
+                <option value="mark_inactive">Deactivate</option>
+                {% endif %}
+            </select>
+            <button type="button" id="applyBulkAction" style="padding: 6px 16px; background: var(--gold); color: var(--dark-bg); border: none; border-radius: 4px; font-weight: 600; font-size: 12px; cursor: pointer;">Apply</button>
+        </div>
+    </div>
+
+    <!-- Table -->
+    <div style="overflow-x: auto;">
+        <table style="width: 100%; border-collapse: collapse; font-size: 13px;">
+            <thead>
+                <tr style="border-bottom: 1px solid var(--border-subtle);">
+                    <th style="padding: 10px 12px; text-align: left; width: 36px;">
+                        <input type="checkbox" id="selectAllTable" style="width: 14px; height: 14px; cursor: pointer;">
+                    </th>
+                    {% for field in config.list_display %}
+                    <th style="padding: 10px 12px; text-align: left; font-size: 10px; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text-muted); font-weight: 600;">
+                        {{ field|title }}
+                        <a href="?{% if search_query %}q={{ search_query }}&{% endif %}order_by={% if order_field == field and order_direction == 'asc' %}-{% endif %}{{ field }}" style="color: var(--text-muted); text-decoration: none; margin-left: 4px;">
+                            {% if order_field == field %}
+                                {% if order_direction == 'asc' %}↑{% else %}↓{% endif %}
+                            {% else %}
+                                ↕
+                            {% endif %}
+                        </a>
+                    </th>
+                    {% endfor %}
+                    <th style="padding: 10px 12px; text-align: right; font-size: 10px; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text-muted); font-weight: 600;">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in page_obj %}
+                <tr style="border-bottom: 1px solid rgba(255,255,255,0.03); transition: background 0.15s;" onmouseover="this.style.background='rgba(255,255,255,0.02)'" onmouseout="this.style.background=''">
+                    <td style="padding: 10px 12px;">
+                        <input type="checkbox" class="row-select" value="{{ item.id }}" style="width: 14px; height: 14px; cursor: pointer;">
+                    </td>
+                    {% for field in config.list_display %}
+                    <td style="padding: 10px 12px; color: var(--text-secondary);">
+                        {% with value=item|attr:field %}
+                            {% if value is True %}
+                                ✅
+                            {% elif value is False %}
+                                ❌
+                            {% elif value %}
+                                {{ value }}
+                            {% else %}
+                                <span style="color: var(--text-muted);">—</span>
+                            {% endif %}
+                        {% endwith %}
+                    </td>
+                    {% endfor %}
+                    <td style="padding: 10px 12px; text-align: right; white-space: nowrap;">
+                        <a href="{% url 'admin_dashboard:model_edit' model_name item.id %}" style="color: var(--gold); text-decoration: none; margin-right: 12px; font-size: 13px;">✏️</a>
+                        <button type="button" onclick="confirmDelete('{{ model_name }}', {{ item.id }}, '{{ item|truncatechars:50 }}')" style="color: var(--danger-red); background: none; border: none; cursor: pointer; font-size: 13px;">🗑️</button>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="{{ config.list_display|length|add:2 }}" style="padding: 40px; text-align: center; color: var(--text-muted);">
+                        <p style="font-size: 40px; margin-bottom: 10px;">📭</p>
+                        <p>No {{ config.label|lower }} found.</p>
+                        <a href="{% url 'admin_dashboard:model_add' model_name %}" style="color: var(--gold); text-decoration: none;">Create the first one</a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+</form>
+
+<!-- Pagination -->
+{% if page_obj.paginator.num_pages > 1 %}
+<div style="display: flex; justify-content: center; gap: 6px;">
+    {% if page_obj.has_previous %}
+    <a href="?page=1{% if search_query %}&q={{ search_query }}{% endif %}" style="padding: 6px 12px; border: 1px solid var(--border-subtle); border-radius: 4px; color: var(--text-muted); text-decoration: none; font-size: 13px;">«</a>
+    <a href="?page={{ page_obj.previous_page_number }}{% if search_query %}&q={{ search_query }}{% endif %}" style="padding: 6px 12px; border: 1px solid var(--border-subtle); border-radius: 4px; color: var(--text-muted); text-decoration: none; font-size: 13px;">‹</a>
+    {% endif %}
+
+    <span style="padding: 6px 12px; border: 1px solid var(--gold); border-radius: 4px; color: var(--gold); font-size: 13px;">{{ page_obj.number }}</span>
+
+    {% if page_obj.has_next %}
+    <a href="?page={{ page_obj.next_page_number }}{% if search_query %}&q={{ search_query }}{% endif %}" style="padding: 6px 12px; border: 1px solid var(--border-subtle); border-radius: 4px; color: var(--text-muted); text-decoration: none; font-size: 13px;">›</a>
+    <a href="?page={{ page_obj.paginator.num_pages }}{% if search_query %}&q={{ search_query }}{% endif %}" style="padding: 6px 12px; border: 1px solid var(--border-subtle); border-radius: 4px; color: var(--text-muted); text-decoration: none; font-size: 13px;">»</a>
+    {% endif %}
+</div>
+{% endif %}
+
+<!-- Delete Confirmation Modal -->
+<div id="deleteModal" style="display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.7); backdrop-filter: blur(4px); z-index: 1000; align-items: center; justify-content: center;">
+    <div style="background: var(--panel-dark); border-radius: 12px; padding: 32px; max-width: 420px; width: 90%; border: 1px solid var(--border-subtle); box-shadow: 0 20px 60px rgba(0,0,0,0.5);">
+        <div style="text-align: center;">
+            <div style="font-size: 48px; margin-bottom: 12px;">⚠️</div>
+            <h3 style="font-size: 20px; font-weight: 700; color: var(--text-white);">Confirm Delete</h3>
+            <p style="color: var(--text-muted); font-size: 14px; margin: 8px 0 16px 0;">
+                Are you sure you want to delete "<span id="deleteItemName" style="color: var(--text-white); font-weight: 600;"></span>"?
+                <br>
+                <span style="font-size: 12px; color: var(--danger-red);">This action cannot be undone!</span>
+            </p>
+            <div style="display: flex; gap: 12px; justify-content: center;">
+                <button onclick="closeDeleteModal()" style="padding: 10px 24px; background: transparent; border: 1px solid var(--border-subtle); border-radius: 6px; color: var(--text-muted); font-weight: 600; cursor: pointer;">Cancel</button>
+                <button id="confirmDeleteBtn" style="padding: 10px 24px; background: var(--danger-red); border: none; border-radius: 6px; color: var(--dark-bg); font-weight: 700; cursor: pointer;">Yes, Delete</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Select All
+    document.getElementById('selectAll').addEventListener('change', function() {
+        const checked = this.checked;
+        document.querySelectorAll('.row-select').forEach(cb => cb.checked = checked);
+    });
+    document.getElementById('selectAllTable').addEventListener('change', function() {
+        const checked = this.checked;
+        document.querySelectorAll('.row-select').forEach(cb => cb.checked = checked);
+    });
+
+    // Delete Confirmation
+    let deleteUrl = '';
+    function confirmDelete(modelName, id, name) {
+        document.getElementById('deleteItemName').textContent = name;
+        document.getElementById('deleteModal').style.display = 'flex';
+        deleteUrl = `/admin-dashboard/models/${modelName}/${id}/delete/`;
+    }
+    function closeDeleteModal() {
+        document.getElementById('deleteModal').style.display = 'none';
+    }
+    document.getElementById('confirmDeleteBtn').addEventListener('click', function() {
+        const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]')?.value || '';
+        fetch(deleteUrl, {
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': csrftoken,
+                'Content-Type': 'application/json'
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                closeDeleteModal();
+                location.reload();
+            } else {
+                alert('Error: ' + (data.error || 'Failed to delete'));
+            }
+        })
+        .catch(error => {
+            alert('Error deleting record.');
+            console.error(error);
+        });
+    });
+    document.getElementById('deleteModal').addEventListener('click', function(e) {
+        if (e.target === this) closeDeleteModal();
+    });
+
+    // Bulk Action
+    document.getElementById('applyBulkAction').addEventListener('click', function() {
+        const action = document.getElementById('bulkActionSelect').value;
+        if (!action) {
+            alert('Please select an action.');
+            return;
+        }
+        const selected = document.querySelectorAll('.row-select:checked');
+        if (selected.length === 0) {
+            alert('Please select at least one record.');
+            return;
+        }
+        const ids = Array.from(selected).map(cb => cb.value);
+        document.getElementById('bulkIds').value = JSON.stringify(ids);
+        if (action === 'delete') {
+            if (!confirm(`Are you sure you want to delete ${ids.length} records? This cannot be undone.`)) {
+                return;
+            }
+        }
+        document.getElementById('bulkActionForm').submit();
+    });
+</script>
+
+<style>
+    .admin-header { margin-bottom: 20px; }
+    .admin-header h1 { font-size: 24px; font-weight: 700; margin: 0; }
+</style>
+{% endblock %}
