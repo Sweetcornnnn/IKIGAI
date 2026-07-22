@@ -9,8 +9,10 @@ from django.core.paginator import Paginator
 from django.apps import apps
 from django.db import models as django_models
 from django.contrib.auth import authenticate, login, logout
+from django.conf import settings
 import json
-from datetime import datetime, timedelta
+from datetime import timedelta
+import datetime as dt   # renamed import to avoid shadowing
 
 # Import models used in the admin dashboard
 from apps.tasks.models import Task
@@ -31,6 +33,7 @@ ADMIN_MODELS = {
         'list_filter': ['is_active', 'is_staff', 'is_superuser'],
         'editable_fields': ['username', 'email', 'first_name', 'last_name', 'is_active', 'is_staff'],
         'hidden_fields': ['password', 'last_login'],
+        'user_foreign_key': False,
     },
     'profiles': {
         'model': 'accounts.Profile',
@@ -40,6 +43,7 @@ ADMIN_MODELS = {
         'list_display': ['user', 'xp', 'level', 'streak_days', 'created_at'],
         'list_filter': ['level'],
         'editable_fields': ['avatar', 'bio', 'xp', 'level', 'streak_days'],
+        'user_foreign_key': 'user',
     },
     'tasks': {
         'model': 'tasks.Task',
@@ -49,6 +53,7 @@ ADMIN_MODELS = {
         'list_display': ['title', 'user', 'category', 'priority', 'status', 'created_at'],
         'list_filter': ['category', 'priority', 'status', 'created_at'],
         'editable_fields': ['title', 'description', 'category', 'priority', 'status', 'due_date', 'xp_reward'],
+        'user_foreign_key': 'user',
     },
     'habits': {
         'model': 'habits.Habit',
@@ -58,6 +63,7 @@ ADMIN_MODELS = {
         'list_display': ['name', 'user', 'icon', 'active', 'created_at'],
         'list_filter': ['active', 'created_at'],
         'editable_fields': ['name', 'icon', 'active'],
+        'user_foreign_key': 'user',
     },
     'habitlogs': {
         'model': 'habits.HabitLog',
@@ -67,6 +73,7 @@ ADMIN_MODELS = {
         'list_display': ['habit', 'user', 'date', 'completed'],
         'list_filter': ['date', 'completed'],
         'editable_fields': ['date', 'completed'],
+        'user_foreign_key': 'user',
     },
     'goals': {
         'model': 'goals.Goal',
@@ -76,6 +83,7 @@ ADMIN_MODELS = {
         'list_display': ['title', 'user', 'category', 'completed', 'created_at'],
         'list_filter': ['category', 'completed', 'created_at'],
         'editable_fields': ['emoji', 'title', 'description', 'category', 'completed'],
+        'user_foreign_key': 'user',
     },
     'achievements': {
         'model': 'gamification.Achievement',
@@ -84,7 +92,9 @@ ADMIN_MODELS = {
         'search_fields': ['name', 'description'],
         'list_display': ['name', 'category', 'requirement_type', 'requirement_value', 'xp_reward'],
         'list_filter': ['category', 'requirement_type'],
-        'editable_fields': ['name', 'description', 'icon', 'category', 'requirement_type', 'requirement_value', 'xp_reward', 'order'],
+        'editable_fields': ['name', 'description', 'icon', 'category', 'requirement_type', 'requirement_value',
+                            'xp_reward', 'order'],
+        'user_foreign_key': False,
     },
     'userachievements': {
         'model': 'gamification.UserAchievement',
@@ -94,6 +104,7 @@ ADMIN_MODELS = {
         'list_display': ['user', 'achievement', 'unlocked_at'],
         'list_filter': ['unlocked_at'],
         'editable_fields': ['user', 'achievement'],
+        'user_foreign_key': 'user',
     },
     'notifications': {
         'model': 'notifications.Notification',
@@ -103,6 +114,7 @@ ADMIN_MODELS = {
         'list_display': ['title', 'user', 'type', 'is_read', 'created_at'],
         'list_filter': ['type', 'is_read', 'created_at'],
         'editable_fields': ['type', 'title', 'message', 'link', 'is_read'],
+        'user_foreign_key': 'user',
     },
 }
 
@@ -287,11 +299,64 @@ def admin_model_list(request, model_name):
             search_conditions |= Q(**{f'{field}__icontains': search_query})
         queryset = queryset.filter(search_conditions)
 
+    # ─── Filter handling with type conversion ────────────────────────────
     for filter_field in config.get('list_filter', []):
         filter_value = request.GET.get(f'filter_{filter_field}')
-        if filter_value:
-            queryset = queryset.filter(**{filter_field: filter_value})
+        if not filter_value:   # skip empty
+            continue
 
+        try:
+            field = model_class._meta.get_field(filter_field)
+        except django_models.fields.FieldDoesNotExist:
+            continue
+
+        # ---- Handle Date/DateTime fields ----
+        if isinstance(field, (django_models.DateField, django_models.DateTimeField)):
+            parsed = None
+            formats = [
+                '%B %d, %Y, %I:%M %p',       # June 29, 2026, 08:07 AM
+                '%B %d, %Y, %I:%M %p',
+                '%b %d, %Y, %I:%M %p',       # Jun 29, 2026, 08:07 AM
+                '%B %d, %Y',                 # June 29, 2026
+                '%b %d, %Y',                 # Jun 29, 2026
+                '%Y-%m-%d',                  # 2026-06-29
+                '%m/%d/%Y',                  # 06/29/2026
+                '%d/%m/%Y',                  # 29/06/2026
+                '%Y-%m-%d %H:%M:%S',         # 2026-06-29 08:07:00
+                '%Y-%m-%d %H:%M',            # 2026-06-29 08:07
+            ]
+            for fmt in formats:
+                try:
+                    parsed = dt.datetime.strptime(filter_value, fmt)
+                    break
+                except ValueError:
+                    continue
+            if parsed is None:
+                messages.warning(request, f'Could not parse date filter value: {filter_value}')
+                continue
+            if settings.USE_TZ and isinstance(field, django_models.DateTimeField):
+                parsed = timezone.make_aware(parsed, timezone.get_current_timezone())
+            if isinstance(field, django_models.DateField):
+                filter_value = parsed.date()
+            else:
+                filter_value = parsed
+
+        # ---- Handle Boolean fields ----
+        elif isinstance(field, django_models.BooleanField):
+            if filter_value.lower() in ('true', '1', 'on'):
+                filter_value = True
+            elif filter_value.lower() in ('false', '0', 'off'):
+                filter_value = False
+            else:
+                messages.warning(request, f'Invalid boolean filter value: {filter_value}')
+                continue
+
+        # (Add conversions for other field types if needed)
+
+        # Apply the filter
+        queryset = queryset.filter(**{filter_field: filter_value})
+
+    # ─── Ordering ──────────────────────────────────────────────────────────
     order_by = request.GET.get('order_by', '-created_at' if hasattr(model_class, 'created_at') else 'id')
     if order_by.startswith('-'):
         queryset = queryset.order_by(order_by)
@@ -306,12 +371,22 @@ def admin_model_list(request, model_name):
     page_number = request.GET.get('page', 1)
     page_obj = paginator.get_page(page_number)
 
+    # ─── Build filter dropdown options ──────────────────────────────────
     filter_options = {}
     for filter_field in config.get('list_filter', []):
-        field = model_class._meta.get_field(filter_field)
+        try:
+            field = model_class._meta.get_field(filter_field)
+        except django_models.fields.FieldDoesNotExist:
+            continue
         choices = []
         if field.choices:
             choices = field.choices
+        elif isinstance(field, django_models.BooleanField):
+            # Explicitly define choices for BooleanField
+            if field.null:
+                choices = [(None, 'Unknown'), (True, 'True'), (False, 'False')]
+            else:
+                choices = [(True, 'True'), (False, 'False')]
         else:
             distinct_values = model_class.objects.values_list(filter_field, flat=True).distinct()
             choices = [(v, v) for v in distinct_values if v is not None]
@@ -330,11 +405,11 @@ def admin_model_list(request, model_name):
     return render(request, 'admin_dashboard/model_list.html', context)
 
 
-# ─── FIXED: admin_model_add ────────────────────────────────────────────────
+# ─── FIXED: admin_model_add (Automatically assigns current admin as user) ───
 
 @user_passes_test(is_admin, login_url='admin_dashboard:login')
 def admin_model_add(request, model_name):
-    """Add a new record with proper date and empty field handling"""
+    """Add a new record with proper date, empty field, and user assignment"""
     config = ADMIN_MODELS.get(model_name)
     if not config:
         messages.error(request, f'Model "{model_name}" not found.')
@@ -350,27 +425,34 @@ def admin_model_add(request, model_name):
             instance = model_class()
             editable_fields = config.get('editable_fields', [])
 
+            # ─── Get the user foreign key field ───
+            user_field = config.get('user_foreign_key', False)
+
+            # ─── Auto-assign the current admin user ───
+            if user_field:
+                setattr(instance, user_field, request.user)
+
             for field in editable_fields:
                 value = request.POST.get(field)
                 field_obj = model_class._meta.get_field(field)
 
-                # --- Handle empty values ---
+                # Handle empty values
                 if value == '':
                     if isinstance(field_obj, (django_models.TextField, django_models.CharField)):
-                        value = ''  # empty string for text fields
+                        value = ''
                     else:
                         value = None
                 elif value is None:
                     value = None
 
-                # --- Parse based on field type ---
+                # Parse based on field type
                 if value is not None:
                     if isinstance(field_obj, (django_models.DateField, django_models.DateTimeField)):
                         date_formats = ['%Y-%m-%d', '%B %d, %Y', '%b %d, %Y', '%m/%d/%Y', '%d/%m/%Y']
                         parsed = None
                         for fmt in date_formats:
                             try:
-                                parsed = datetime.strptime(value, fmt)
+                                parsed = dt.datetime.strptime(value, fmt)
                                 break
                             except ValueError:
                                 continue
@@ -387,12 +469,10 @@ def admin_model_add(request, model_name):
                     else:
                         instance.__setattr__(field, value)
                 else:
-                    # For NULL values
                     if field_obj.null:
                         instance.__setattr__(field, None)
                     elif isinstance(field_obj, (django_models.TextField, django_models.CharField)):
                         instance.__setattr__(field, '')
-                    # else let Django's default handle it
 
             instance.save()
             messages.success(request, f'{config["label"]} added successfully!')
@@ -416,7 +496,7 @@ def admin_model_add(request, model_name):
     return render(request, 'admin_dashboard/model_form.html', context)
 
 
-# ─── FIXED: admin_model_edit ───────────────────────────────────────────────
+# ─── FIXED: admin_model_edit (Proper user handling) ───
 
 @user_passes_test(is_admin, login_url='admin_dashboard:login')
 def admin_model_edit(request, model_name, pk):
@@ -437,27 +517,34 @@ def admin_model_edit(request, model_name, pk):
         try:
             editable_fields = config.get('editable_fields', [])
 
+            # ─── Get the user foreign key field ───
+            user_field = config.get('user_foreign_key', False)
+
+            # ─── Ensure the current admin is the user (if field exists) ───
+            if user_field and hasattr(instance, user_field):
+                setattr(instance, user_field, request.user)
+
             for field in editable_fields:
                 value = request.POST.get(field)
                 field_obj = model_class._meta.get_field(field)
 
-                # --- Handle empty values ---
+                # Handle empty values
                 if value == '':
                     if isinstance(field_obj, (django_models.TextField, django_models.CharField)):
-                        value = ''  # empty string for text fields
+                        value = ''
                     else:
                         value = None
                 elif value is None:
                     value = None
 
-                # --- Parse based on field type ---
+                # Parse based on field type
                 if value is not None:
                     if isinstance(field_obj, (django_models.DateField, django_models.DateTimeField)):
                         date_formats = ['%Y-%m-%d', '%B %d, %Y', '%b %d, %Y', '%m/%d/%Y', '%d/%m/%Y']
                         parsed = None
                         for fmt in date_formats:
                             try:
-                                parsed = datetime.strptime(value, fmt)
+                                parsed = dt.datetime.strptime(value, fmt)
                                 break
                             except ValueError:
                                 continue
@@ -474,12 +561,10 @@ def admin_model_edit(request, model_name, pk):
                     else:
                         instance.__setattr__(field, value)
                 else:
-                    # For NULL values
                     if field_obj.null:
                         instance.__setattr__(field, None)
                     elif isinstance(field_obj, (django_models.TextField, django_models.CharField)):
                         instance.__setattr__(field, '')
-                    # else let Django's default handle it
 
             instance.save()
             messages.success(request, f'{config["label"]} updated successfully!')

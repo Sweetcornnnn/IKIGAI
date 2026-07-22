@@ -7,7 +7,6 @@ class TaskForm(forms.ModelForm):
     Form for creating and editing tasks
     """
 
-    # Custom day selector for weekly view
     DAY_CHOICES = [
         (0, 'Monday'),
         (1, 'Tuesday'),
@@ -18,19 +17,23 @@ class TaskForm(forms.ModelForm):
         (6, 'Sunday'),
     ]
 
-    day = forms.ChoiceField(choices=DAY_CHOICES, label='Day', required=True)
+    day = forms.ChoiceField(choices=DAY_CHOICES, label='Day', required=False)
 
     class Meta:
         model = Task
-        fields = ['title', 'description', 'priority', 'day']
+        fields = ['title', 'description', 'category', 'priority', 'due_date', 'day']
         widgets = {
-            'description': forms.Textarea(attrs={'rows': 3, 'placeholder': 'Add details about this task...'}),
             'title': forms.TextInput(attrs={'placeholder': 'What do you want to accomplish?'}),
+            'description': forms.Textarea(attrs={'rows': 3, 'placeholder': 'Add details about this task...'}),
+            'due_date': forms.DateInput(attrs={'type': 'date'}),
         }
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.fields['title'].label = 'Task Name'
-        self.fields['description'].label = 'Description (optional)'
+        self.fields['description'].label = 'Description'
+        self.fields['category'].label = 'Category'
         self.fields['priority'].label = 'Priority'
-        self.fields['day'].label = 'Which day?'
+        self.fields['due_date'].label = 'Due Date'
+        self.fields['day'].label = 'Day'
+        self.fields['day'].required = False

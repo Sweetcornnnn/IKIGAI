@@ -515,5 +515,13 @@
         }
     })();
 </script>
+<!-- ─── Chat Sidebar ─── -->
+{% if user.is_authenticated %}
+    <script>
+        window.CHAT_USER_ID = {{ user.id }};
+        window.CHAT_USERNAME = '{{ user.username }}';
+    </script>
+    {% include 'chat/_sidebar.html' %}
+{% endif %}
 </body>
 </html>

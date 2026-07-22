@@ -12,6 +12,7 @@ urlpatterns = [
     path('habits/', include('apps.habits.urls')),
     path('goals/', include('apps.goals.urls')),
     path('admin-dashboard/', include('apps.admin_dashboard.urls')),
+    path('chat/', include('apps.chat.urls')),
 ]
 
 if settings.DEBUG:

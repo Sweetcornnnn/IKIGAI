@@ -5,17 +5,36 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="76db4c93-058d-48aa-8f5b-ed13a09c349a" name="Changes" comment="Adjusted the 100% of nodes to be seen.">
-      <change afterPath="$PROJECT_DIR$/apps/admin_dashboard/templatetags/admin_filters.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/templates/admin_dashboard/model_form.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/templates/admin_dashboard/model_list.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/apps/accounts/signals.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/apps/chat/management/__init__.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/apps/chat/management/commands/__init__.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/apps/chat/management/commands/runserver.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/apps/chat/urls.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/apps/discord_bot.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/apps/notifications/discord.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/static/chat/css/chat.css" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/static/chat/js/chat.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/templates/chat/_sidebar.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/apps/admin_dashboard/urls.py" beforeDir="false" afterPath="$PROJECT_DIR$/apps/admin_dashboard/urls.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/accounts/__init__.py" beforeDir="false" afterPath="$PROJECT_DIR$/apps/accounts/__init__.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/accounts/apps.py" beforeDir="false" afterPath="$PROJECT_DIR$/apps/accounts/apps.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/accounts/urls.py" beforeDir="false" afterPath="$PROJECT_DIR$/apps/accounts/urls.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/accounts/views.py" beforeDir="false" afterPath="$PROJECT_DIR$/apps/accounts/views.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/apps/admin_dashboard/views.py" beforeDir="false" afterPath="$PROJECT_DIR$/apps/admin_dashboard/views.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/apps/goals/models.py" beforeDir="false" afterPath="$PROJECT_DIR$/apps/goals/models.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/tasks/forms.py" beforeDir="false" afterPath="$PROJECT_DIR$/apps/tasks/forms.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/tasks/views.py" beforeDir="false" afterPath="$PROJECT_DIR$/apps/tasks/views.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/core/asgi.py" beforeDir="false" afterPath="$PROJECT_DIR$/core/asgi.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/core/settings.py" beforeDir="false" afterPath="$PROJECT_DIR$/core/settings.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/core/urls.py" beforeDir="false" afterPath="$PROJECT_DIR$/core/urls.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/db.sqlite3" beforeDir="false" afterPath="$PROJECT_DIR$/db.sqlite3" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/templates/admin_dashboard/base.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/admin_dashboard/base.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/templates/admin_dashboard/index.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/admin_dashboard/index.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/templates/admin_dashboard/users.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/admin_dashboard/users.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/templates/admin_dashboard/model_list.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/admin_dashboard/model_list.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/templates/dashboard/base.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/dashboard/base.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/templates/goals/dashboard.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/goals/dashboard.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/templates/habits/list.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/habits/list.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/templates/tasks/task_form.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/tasks/task_form.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/templates/tasks/task_list.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/tasks/task_list.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/templates/tasks/weekly.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/tasks/weekly.html" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -23,11 +42,13 @@
     <option name="LAST_RESOLUTION" value="IGNORE" />
   </component>
   <component name="EmbeddingIndexingInfo">
-    <option name="cachedIndexableFilesCount" value="125" />
+    <option name="cachedIndexableFilesCount" value="146" />
   </component>
   <component name="FileTemplateManagerImpl">
     <option name="RECENT_TEMPLATES">
       <list>
+        <option value="CSS File" />
+        <option value="JavaScript File" />
         <option value="HTML File" />
         <option value="Python Script" />
       </list>
@@ -54,23 +75,23 @@
   </component>
   <component name="NextEditCompletionFeaturesState">
     <decayedCancelled>
-      <entry key="MS100" value="1.001343302556905" />
-      <entry key="MS500" value="1.269149911330309" />
-      <entry key="S2" value="2.2424915898003683" />
-      <entry key="S5" value="4.324639666370056" />
-      <entry key="S10" value="6.425568955500977" />
-      <entry key="S30" value="11.879492538964113" />
-      <entry key="S60" value="17.259022360722668" />
-      <entry key="M2" value="22.191877132045445" />
-      <entry key="M5" value="26.430478253412602" />
-      <entry key="M10" value="28.23437841687979" />
-      <entry key="M15" value="29.017609945625576" />
-      <entry key="M30" value="30.113176924539147" />
-      <entry key="H1" value="30.906413633199076" />
-      <entry key="H2" value="31.406227644768105" />
-      <entry key="H4" value="31.689924898047668" />
-      <entry key="D1" value="31.946351676441257" />
-      <entry key="W1" value="31.992285829819274" />
+      <entry key="MS100" value="1.2754762789691527" />
+      <entry key="MS500" value="1.7727105496479874" />
+      <entry key="S2" value="1.9375710964571098" />
+      <entry key="S5" value="1.9745445209692511" />
+      <entry key="S10" value="1.9871902151912018" />
+      <entry key="S30" value="1.9957117085734724" />
+      <entry key="S60" value="1.9978535506643609" />
+      <entry key="M2" value="1.99892619880768" />
+      <entry key="M5" value="1.9995703410778953" />
+      <entry key="M10" value="1.9997851474581403" />
+      <entry key="M15" value="1.9998567598425354" />
+      <entry key="M30" value="1.9999283773563699" />
+      <entry key="H1" value="1.999964568708053" />
+      <entry key="H2" value="2.004311549018591" />
+      <entry key="H4" value="2.516657277504791" />
+      <entry key="D1" value="32.57882337085072" />
+      <entry key="W1" value="64.17354518336657" />
     </decayedCancelled>
     <decayedSelected>
       <entry key="MS100" value="0.0" />
@@ -80,35 +101,35 @@
       <entry key="S10" value="0.0" />
       <entry key="S30" value="0.0" />
       <entry key="S60" value="0.0" />
-      <entry key="M2" value="0.0" />
-      <entry key="M5" value="0.0" />
-      <entry key="M10" value="0.0" />
-      <entry key="M15" value="0.0" />
-      <entry key="M30" value="0.0" />
-      <entry key="H1" value="0.0" />
-      <entry key="H2" value="0.0" />
-      <entry key="H4" value="0.0" />
-      <entry key="D1" value="0.0" />
-      <entry key="W1" value="0.0" />
+      <entry key="M2" value="3.3107869593868516E-240" />
+      <entry key="M5" value="3.706387481132725E-96" />
+      <entry key="M10" value="3.850019698297707E-48" />
+      <entry key="M15" value="3.899293279299992E-32" />
+      <entry key="M30" value="3.949283013183203E-16" />
+      <entry key="H1" value="3.9745498993052735E-8" />
+      <entry key="H2" value="3.987251959636753E-4" />
+      <entry key="H4" value="0.03993620221251722" />
+      <entry key="D1" value="1.856141623277099" />
+      <entry key="W1" value="3.5844657628819547" />
     </decayedSelected>
     <decayedShown>
-      <entry key="MS100" value="0.0025879906695104433" />
-      <entry key="MS500" value="0.5315312407259545" />
-      <entry key="S2" value="1.9561379462469255" />
-      <entry key="S5" value="4.19569566672844" />
-      <entry key="S10" value="6.357315197271535" />
-      <entry key="S30" value="11.85352392155153" />
-      <entry key="S60" value="17.24416922124929" />
-      <entry key="M2" value="22.183492511311403" />
-      <entry key="M5" value="26.426764068945417" />
-      <entry key="M10" value="28.232424613122525" />
-      <entry key="M15" value="29.016264758204105" />
-      <entry key="M30" value="30.112462636311108" />
-      <entry key="H1" value="30.90603786537985" />
-      <entry key="H2" value="31.406033365460722" />
-      <entry key="H4" value="31.68982587385118" />
-      <entry key="D1" value="31.946334882425006" />
-      <entry key="W1" value="31.992283423173976" />
+      <entry key="MS100" value="0.4450518199001116" />
+      <entry key="MS500" value="1.473960174969188" />
+      <entry key="S2" value="1.8526702645850381" />
+      <entry key="S5" value="1.939677740692533" />
+      <entry key="S10" value="1.9696021551243856" />
+      <entry key="S30" value="1.9898143109549808" />
+      <entry key="S60" value="1.994900491576126" />
+      <entry key="M2" value="1.9974485775813184" />
+      <entry key="M5" value="1.9989790303769377" />
+      <entry key="M10" value="1.9994894483886916" />
+      <entry key="M15" value="1.9996596174129662" />
+      <entry key="M30" value="1.9998298012829645" />
+      <entry key="H1" value="1.999915319082608" />
+      <entry key="H2" value="2.0046850306623014" />
+      <entry key="H4" value="2.556550855311541" />
+      <entry key="D1" value="34.43472293332989" />
+      <entry key="W1" value="67.75794406450161" />
     </decayedShown>
   </component>
   <component name="ProjectColorInfo">{
@@ -135,6 +156,8 @@
     &quot;RunOnceActivity.typescript.service.memoryLimit.init&quot;: &quot;true&quot;,
     &quot;codeWithMe.voiceChat.enabledByDefault&quot;: &quot;false&quot;,
     &quot;git-widget-placeholder&quot;: &quot;master&quot;,
+    &quot;last_opened_file_path&quot;: &quot;C:/Users/zolin/PycharmProjects/IKIGAI/apps/chat/management/commands&quot;,
+    &quot;list.type.of.created.stylesheet&quot;: &quot;CSS&quot;,
     &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
     &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
     &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
@@ -143,6 +166,10 @@
   }
 }</component>
   <component name="RecentsManager">
+    <key name="CopyFile.RECENT_KEYS">
+      <recent name="C:\Users\zolin\PycharmProjects\IKIGAI\apps\chat\management\commands" />
+      <recent name="C:\Users\zolin\PycharmProjects\IKIGAI\apps\chat\management" />
+    </key>
     <key name="MoveFile.RECENT_KEYS">
       <recent name="C:\Users\zolin\PycharmProjects\IKIGAI\templates\accounts" />
     </key>

@@ -1,0 +1,120 @@
+{% load static %}
+
+<!-- ─── Chat Overlay ─── -->
+<div class="chat-overlay" id="chatOverlay"></div>
+
+<!-- ─── Chat Sidebar Toggle Button ─── -->
+<div class="chat-sidebar-toggle" id="chatToggle" title="Open Chat">
+    <i class="fas fa-comment-dots icon" id="chatIcon"></i>
+    <span class="label">World Chat</span>
+    <span class="badge" id="chatBadge" style="display: none;">0</span>
+</div>
+
+<!-- ─── Chat Panel ─── -->
+<div class="chat-panel" id="chatPanel">
+    <div class="chat-header">
+        <h3>💬 World Chat</h3>
+    </div>
+
+    <!-- Main Content (Messages + Users Sidebar) -->
+    <div class="chat-main">
+        <!-- Messages -->
+        <div class="chat-messages" id="chatMessages">
+            <div style="text-align: center; color: var(--text-muted); font-size: 13px; padding: 30px 0;">
+                No messages yet. Start the conversation!
+            </div>
+        </div>
+
+        <!-- Users Sidebar -->
+        <div class="chat-users-sidebar" id="usersList">
+            <div class="chat-users-header">Online</div>
+            <div id="usersContainer">
+                <div style="color: var(--text-muted); font-size: 11px; padding: 8px 0; text-align: center;">
+                    Loading...
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Input -->
+    <div class="chat-input-area">
+        <input type="text" id="chatInput" placeholder="Type a message..." />
+        <button id="chatSendBtn">Send</button>
+    </div>
+</div>
+
+<!-- ─── Profile Card Modal ─── -->
+<div class="profile-modal-overlay" id="profileModal">
+    <div class="profile-modal">
+        <button onclick="closeProfileModal()" class="profile-modal-close">✕</button>
+
+        <div class="profile-modal-avatar">
+            <div id="profileAvatar">👤</div>
+        </div>
+
+        <h2 id="profileUsername">Username</h2>
+        <p id="profileBio">Bio goes here</p>
+        <p id="profileJoinDate">Joined January 1, 2025</p>
+
+        <div class="profile-modal-stats">
+            <div>
+                <div id="profileXp">0</div>
+                <span>XP</span>
+            </div>
+            <div>
+                <div id="profileLevel">1</div>
+                <span>Level</span>
+            </div>
+            <div>
+                <div id="profileStreak">0</div>
+                <span>Streak</span>
+            </div>
+        </div>
+
+        <div class="profile-modal-achievements">
+            <div class="profile-modal-achievements-header">
+                <span>🏆 Achievements</span>
+                <span id="profileAchievementCount">0</span>
+            </div>
+            <div id="profileAchievements">
+                <span>No achievements yet</span>
+            </div>
+        </div>
+
+        <div class="profile-modal-actions">
+            <button onclick="openPrivateChat()" class="profile-message-btn">💬 Message</button>
+            <button onclick="closeProfileModal()" class="profile-close-btn">Close</button>
+        </div>
+    </div>
+</div>
+
+<!-- ─── Private Chat Modal ─── -->
+<div class="dm-modal-overlay" id="dmModal">
+    <div class="dm-modal">
+        <div class="dm-modal-header">
+            <div class="dm-modal-user">
+                <div id="dmAvatar">👤</div>
+                <div>
+                    <span id="dmUsername">Username</span>
+                    <span>Private message</span>
+                </div>
+            </div>
+            <button onclick="closeDmModal()" class="dm-modal-close">✕</button>
+        </div>
+
+        <div class="dm-messages" id="dmMessages">
+            <div style="text-align: center; color: var(--text-muted); font-size: 13px; padding: 30px 0;">
+                No messages yet. Say hello! 👋
+            </div>
+        </div>
+
+        <div class="dm-input-area">
+            <input type="text" id="dmInput" placeholder="Type a message..." />
+            <button id="dmSendBtn">Send</button>
+        </div>
+    </div>
+</div>
+
+<!-- ─── Include Chat CSS and JS ─── -->
+<link rel="stylesheet" href="{% static 'chat/css/chat.css' %}?v=21">
+<script src="{% static 'chat/js/chat.js' %}"></script>

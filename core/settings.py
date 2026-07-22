@@ -47,6 +47,7 @@ INSTALLED_APPS = [
     'apps.habits',
     'apps.goals',
     'apps.admin_dashboard',
+    'apps.chat',
 ]
 
 MIDDLEWARE = [
@@ -77,7 +78,7 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = 'core.wsgi.application'
-
+ASGI_APPLICATION = 'core.asgi.application'
 
 # Database
 # https://docs.djangoproject.com/en/6.0/ref/settings/#databases
@@ -124,7 +125,8 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/6.0/howto/static-files/
 
-STATIC_URL = 'static/'
+STATIC_URL = '/static/'
+STATICFILES_DIRS = [BASE_DIR / 'static']
 
 # Authentication Settings
 LOGIN_URL = 'accounts:login'
@@ -134,3 +136,15 @@ LOGOUT_REDIRECT_URL = 'accounts:login'
 # Media Files (for profile pictures)
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
+
+
+
+# In-memory channel layer (no Redis required for development)
+CHANNEL_LAYERS = {
+    "default": {
+        "BACKEND": "channels.layers.InMemoryChannelLayer"
+    }
+}
+
+# ─── Discord Webhook ───
+DISCORD_WEBHOOK_URL = "https://discordapp.com/api/webhooks/1526848448299667566/IurWgY_crCvfPPIlh2ITdR-bysaRoj6vbR7ffe6QsenojH_P-lOXwL9OLPUEX74zGMCI"

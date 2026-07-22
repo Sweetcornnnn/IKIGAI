@@ -3,9 +3,11 @@ from django.contrib import messages
 from django.contrib.auth import login, logout, authenticate
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
+from django.http import JsonResponse
 from .forms import UserRegistrationForm, UserUpdateForm, ProfileUpdateForm
 from django.utils import timezone
 from apps.gamification.utils import get_user_achievements, get_unlocked_count
+from apps.gamification.models import UserAchievement
 
 
 def register(request):
@@ -105,3 +107,44 @@ def achievements(request):
         'total_count': len(achievements),
     }
     return render(request, 'accounts/achievements.html', context)
+
+
+# ─── NEW: Profile API Endpoint for Chat ───
+@login_required
+def get_user_profile(request, user_id):
+    """
+    Get user profile data for the profile card (AJAX)
+    """
+    try:
+        user = User.objects.get(id=user_id)
+        profile = user.profile
+
+        # Get achievements preview (up to 6)
+        achievements = UserAchievement.objects.filter(
+            user=user
+        ).select_related('achievement')[:6]
+
+        achievement_data = [
+            {
+                'icon': ua.achievement.icon,
+                'name': ua.achievement.name,
+            }
+            for ua in achievements
+        ]
+
+        data = {
+            'id': user.id,
+            'username': user.username,
+            'email': user.email,
+            'bio': profile.bio or '',
+            'xp': profile.xp,
+            'level': profile.level,
+            'streak_days': profile.streak_days,
+            'join_date': user.date_joined.strftime('%B %d, %Y'),
+            'avatar': profile.get_avatar_url(),
+            'achievements': achievement_data,
+            'achievement_count': UserAchievement.objects.filter(user=user).count(),
+        }
+        return JsonResponse(data)
+    except User.DoesNotExist:
+        return JsonResponse({'error': 'User not found'}, status=404)

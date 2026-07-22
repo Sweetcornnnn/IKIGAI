@@ -10,24 +10,13 @@ from .forms import TaskForm
 from apps.notifications.utils import create_notification
 from apps.gamification.utils import check_achievements, update_streak
 
-# Circumference for the progress ring (2 * pi * r where r = 25)
-CIRCUMFERENCE = 157.08
+
+# ─── Weekly View ─────────────────────────────────────────────────────────────
 
 def get_week_dates():
     """Get Monday and Sunday of the current week"""
     today = timezone.now().date()
     monday = today - timedelta(days=today.weekday())
-    sunday = monday + timedelta(days=6)
-    return monday, sunday
-
-
-def get_week_range(year, week):
-    """Get Monday and Sunday of a specific week"""
-    first_day_of_year = datetime(year, 1, 1).date()
-    days_to_first_monday = (7 - first_day_of_year.weekday()) % 7
-    first_monday = first_day_of_year + timedelta(days=days_to_first_monday)
-
-    monday = first_monday + timedelta(weeks=week - 1)
     sunday = monday + timedelta(days=6)
     return monday, sunday
 
@@ -62,16 +51,13 @@ def weekly(request):
     weekly_data = []
     total_tasks = 0
     total_completed = 0
+    CIRCUMFERENCE = 157.08  # 2 * pi * 25
 
     for i, day in enumerate(days):
         day_tasks = tasks.filter(due_date=day)
         completed = day_tasks.filter(status='COMPLETED').count()
         total = day_tasks.count()
         percentage = int((completed / total) * 100) if total > 0 else 0
-
-        # Calculate the offset for the progress ring
-        # When percentage is 100%, offset should be 0 (full ring)
-        # When percentage is 0%, offset should be 157.08 (empty ring)
         offset = ((100 - percentage) / 100) * CIRCUMFERENCE
 
         total_tasks += total
@@ -84,7 +70,7 @@ def weekly(request):
             'completed': completed,
             'total': total,
             'percentage': percentage,
-            'offset': offset,  # ← ADDED: For the progress ring
+            'offset': offset,
             'not_done': total - completed,
         })
 
@@ -125,12 +111,10 @@ def weekly(request):
         ("The secret of getting ahead is getting started.", "Mark Twain"),
         ("It does not matter how slowly you go as long as you do not stop.", "Confucius"),
         ("The best time to plant a tree was 20 years ago. The second best time is now.", "Chinese Proverb"),
-        ("What you get by achieving your goals is not as important as what you become by achieving your goals.",
-         "Zig Ziglar"),
+        ("What you get by achieving your goals is not as important as what you become by achieving your goals.", "Zig Ziglar"),
         ("The only impossible journey is the one you never begin.", "Tony Robbins"),
         ("If you can dream it, you can achieve it.", "Zig Ziglar"),
-        ("The secret of change is to focus all of your energy not on fighting the old, but on building the new.",
-         "Socrates"),
+        ("The secret of change is to focus all of your energy not on fighting the old, but on building the new.", "Socrates"),
         ("He who moves not forward, goes backward.", "Johann Wolfgang von Goethe"),
         ("A journey of a thousand miles begins with a single step.", "Lao Tzu"),
         ("The harder you work for something, the greater you'll feel when you achieve it.", "Unknown"),
@@ -239,7 +223,7 @@ def task_toggle(request, pk):
                 notification_type='TASK_COMPLETED',
                 title=f'Task Completed: {task.title} ✅',
                 message=f'You earned {task.xp_reward} XP for completing "{task.title}"',
-                link='/tasks/'
+                link='/tasks/weekly/'
             )
 
             completed = True

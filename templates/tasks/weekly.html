@@ -876,14 +876,6 @@
             <div class="quote-author">— {{ quote.1 }}</div>
         </div>
     </div>
-
-    <!-- ─── Footer ─── -->
-    <div class="weekly-footer">
-        <a href="{% url 'dashboard:home' %}">← Back to Dashboard</a>
-        <span style="color: var(--border-subtle);">|</span>
-        <a href="{% url 'accounts:logout' %}" style="color: var(--danger-red);">Sign Out</a>
-    </div>
-
 </div>
 
 <!-- ─── Add Task Modal ─── -->
@@ -902,6 +894,10 @@
             <div class="form-group">
                 <label for="id_description">Description (optional)</label>
                 {{ form.description }}
+            </div>
+            <div class="form-group">
+                <label for="id_category">Category</label>
+                {{ form.category }}
             </div>
             <div class="form-group">
                 <label for="id_priority">Priority</label>

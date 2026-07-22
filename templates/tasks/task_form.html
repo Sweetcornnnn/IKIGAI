@@ -47,7 +47,7 @@
             <div style="display: flex; gap: 16px; margin-bottom: 18px;">
                 <div style="flex: 1;">
                     <label for="id_category" style="display: block; font-size: 12px; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px;">
-                        Category
+                        Category <span style="color: var(--gold);">*</span>
                     </label>
                     {{ form.category }}
                     {% if form.category.errors %}
@@ -75,7 +75,7 @@
             </div>
 
             <!-- Due Date -->
-            <div style="margin-bottom: 24px;">
+            <div style="margin-bottom: 18px;">
                 <label for="id_due_date" style="display: block; font-size: 12px; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px;">
                     Due Date
                 </label>
@@ -90,8 +90,11 @@
                 <div style="color: rgba(255,255,255,0.3); font-size: 11px; margin-top: 4px;">Leave blank if no deadline.</div>
             </div>
 
+            <!-- Hidden day field (for weekly view, kept out of regular form) -->
+            {{ form.day.as_hidden }}
+
             <!-- Buttons -->
-            <div style="display: flex; gap: 12px;">
+            <div style="display: flex; gap: 12px; margin-top: 8px;">
                 <button type="submit" style="flex: 1; padding: 14px; background-color: var(--gold); color: var(--dark-bg); border: none; border-radius: 8px; font-size: 16px; font-weight: 700; cursor: pointer; transition: opacity 0.2s;">
                     {% if task %}Update Task{% else %}Create Task{% endif %}
                 </button>
@@ -144,11 +147,15 @@
     #id_priority {
         appearance: none;
         cursor: pointer;
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='rgba(255,255,255,0.38)' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
+        background-repeat: no-repeat;
+        background-position: right 12px center;
+        padding-right: 36px;
     }
 
     #id_category option,
     #id_priority option {
-        background-color: var(--panel-dark);
+        background-color: #111927;
         color: var(--text-white);
     }
 
@@ -169,14 +176,6 @@
     #id_priority:hover,
     #id_due_date:hover {
         border-color: rgba(201, 169, 110, 0.3);
-    }
-
-    .btn-hover:hover {
-        opacity: 0.85;
-    }
-
-    .btn-secondary-hover:hover {
-        background-color: rgba(255, 255, 255, 0.08);
     }
 </style>
 {% endblock %}

@@ -7,6 +7,8 @@
     <style>
         :root {
             --admin-gold: #C9A96E;
+            --admin-gold-light: rgba(201, 169, 110, 0.15);
+            --admin-gold-dark: #b8985e;
             --admin-bg: #0a0f1a;
             --admin-panel: #111927;
             --text-white: #FFFFFF;
@@ -61,44 +63,54 @@
 
         .admin-nav .nav-links {
             display: flex;
-            gap: 20px;
+            gap: 4px;
             align-items: center;
+            flex-wrap: wrap;
         }
 
         .admin-nav .nav-links a {
             color: var(--text-muted);
             text-decoration: none;
             font-size: 13px;
-            padding: 6px 12px;
-            border-radius: 4px;
-            transition: all 0.2s;
+            padding: 7px 16px;
+            border-radius: 6px;
+            transition: all 0.2s ease;
+            position: relative;
+            font-weight: 500;
         }
 
+        /* ─── Hover Effect ─── */
         .admin-nav .nav-links a:hover {
             color: var(--text-white);
-            background: rgba(255,255,255,0.04);
+            background: var(--admin-gold-light);
         }
 
+        /* ─── Active Tab ─── */
         .admin-nav .nav-links a.active {
             color: var(--admin-gold);
-            background: rgba(201,169,110,0.08);
+            background: var(--admin-gold-light);
+            font-weight: 600;
         }
 
+        /* ─── Logout Button ─── */
         .admin-nav .nav-links .logout-btn {
             color: var(--admin-red);
         }
 
         .admin-nav .nav-links .logout-btn:hover {
-            background: rgba(224,112,112,0.1);
+            color: #ff8a8a;
+            background: rgba(224, 112, 112, 0.12);
         }
 
         .admin-nav .admin-badge {
             font-size: 11px;
             padding: 4px 12px;
             border-radius: 12px;
-            background: rgba(201,169,110,0.15);
+            background: rgba(201, 169, 110, 0.15);
             color: var(--admin-gold);
-            border: 1px solid rgba(201,169,110,0.2);
+            border: 1px solid rgba(201, 169, 110, 0.2);
+            font-weight: 600;
+            margin-left: 4px;
         }
 
         /* ─── Container ─── */
@@ -307,8 +319,12 @@
                 padding: 12px 16px;
             }
             .admin-nav .nav-links {
-                flex-wrap: wrap;
                 justify-content: center;
+                gap: 4px;
+            }
+            .admin-nav .nav-links a {
+                padding: 5px 12px;
+                font-size: 12px;
             }
             .admin-container {
                 padding: 16px;
@@ -320,6 +336,19 @@
                 grid-template-columns: repeat(2, 1fr);
             }
         }
+
+        @media (max-width: 480px) {
+            .admin-nav .nav-links a {
+                font-size: 11px;
+                padding: 4px 8px;
+            }
+            .stats-grid-admin {
+                grid-template-columns: 1fr 1fr;
+            }
+            .admin-nav .brand {
+                font-size: 16px;
+            }
+        }
     </style>
 </head>
 <body>
@@ -329,17 +358,35 @@
             <span>🛡️</span> IKIGAI Admin
         </a>
         <div class="nav-links">
-    <a href="{% url 'admin_dashboard:dashboard' %}" class="{% if request.resolver_match.url_name == 'dashboard' %}active{% endif %}">Dashboard</a>
-    <a href="{% url 'admin_dashboard:users' %}" class="{% if request.resolver_match.url_name == 'users' %}active{% endif %}">Users</a>
-    <a href="{% url 'admin_dashboard:model_list' 'tasks' %}">Tasks</a>
-    <a href="{% url 'admin_dashboard:model_list' 'habits' %}">Habits</a>
-    <a href="{% url 'admin_dashboard:model_list' 'goals' %}">Goals</a>
-    <a href="{% url 'admin_dashboard:model_list' 'achievements' %}">Achievements</a>
-    <a href="{% url 'admin_dashboard:model_list' 'notifications' %}">Notifications</a>
-    <a href="{% url 'admin_dashboard:system' %}" class="{% if request.resolver_match.url_name == 'system' %}active{% endif %}">System</a>
-    <span class="admin-badge">Admin</span>
-    <a href="{% url 'admin_dashboard:logout' %}" class="logout-btn">Logout</a>
-</div>
+            <a href="{% url 'admin_dashboard:dashboard' %}" class="{% if request.resolver_match.url_name == 'dashboard' %}active{% endif %}">Dashboard</a>
+            <a href="{% url 'admin_dashboard:users' %}" class="{% if request.resolver_match.url_name == 'users' %}active{% endif %}">Users</a>
+
+            <!-- ─── Model Links ─── -->
+            <a href="{% url 'admin_dashboard:model_list' 'tasks' %}"
+               class="{% if request.resolver_match.url_name == 'model_list' and request.resolver_match.kwargs.model_name == 'tasks' %}active{% endif %}">
+                Tasks
+            </a>
+            <a href="{% url 'admin_dashboard:model_list' 'habits' %}"
+               class="{% if request.resolver_match.url_name == 'model_list' and request.resolver_match.kwargs.model_name == 'habits' %}active{% endif %}">
+                Habits
+            </a>
+            <a href="{% url 'admin_dashboard:model_list' 'goals' %}"
+               class="{% if request.resolver_match.url_name == 'model_list' and request.resolver_match.kwargs.model_name == 'goals' %}active{% endif %}">
+                Goals
+            </a>
+            <a href="{% url 'admin_dashboard:model_list' 'achievements' %}"
+               class="{% if request.resolver_match.url_name == 'model_list' and request.resolver_match.kwargs.model_name == 'achievements' %}active{% endif %}">
+                Achievements
+            </a>
+            <a href="{% url 'admin_dashboard:model_list' 'notifications' %}"
+               class="{% if request.resolver_match.url_name == 'model_list' and request.resolver_match.kwargs.model_name == 'notifications' %}active{% endif %}">
+                Notifications
+            </a>
+
+            <a href="{% url 'admin_dashboard:system' %}" class="{% if request.resolver_match.url_name == 'system' %}active{% endif %}">System</a>
+            <span class="admin-badge">Admin</span>
+            <a href="{% url 'admin_dashboard:logout' %}" class="logout-btn">Logout</a>
+        </div>
     </nav>
 
     <div class="admin-container">
